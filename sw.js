@@ -1,5 +1,5 @@
 // Guarda la app en el teléfono para que abra sin internet
-const CACHE="ruta-ingles-v8";
+const CACHE="ruta-ingles-v9";
 const FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","icon-maskable.png","apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith("ruta-ingles-")&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

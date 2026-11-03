@@ -201,6 +201,14 @@ textarea{width:100%;min-height:80px;font:500 12.5px var(--mono)}
 .form-err input[type=text],.form-err select{font:500 15px var(--body);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink);width:100%}
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 details summary{cursor:pointer;font-weight:600}
+/* tarjetas plegables */
+.foldhead{all:unset;box-sizing:border-box;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.foldhead:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
+.foldhead .badge{font:700 13px var(--mono);padding:3px 10px;border-radius:999px;background:var(--fc-soft);color:var(--fc)}
+.chev{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--fc-soft);color:var(--fc);transition:transform .2s}
+.chev svg{width:16px;height:16px}
+.fold[data-state="true"] .chev{transform:rotate(180deg)}
+.fold .hint{font-size:13px;color:var(--muted)}
 /* práctica */
 .q{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--surface2)}
 .q .s{font-weight:600}
@@ -247,6 +255,7 @@ a.link{color:var(--c-gram);font-weight:600}
   <symbol id="i-week" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></g></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-9"/></g></symbol>
   <symbol id="i-err" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16Z"/><path d="m13.5 6.5 4 4"/></g></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5 9 4l6 2.5L20 4v13.5L15 20l-6-2.5L4 20Z"/><path d="M9 4v13.5M15 6.5V20"/></g></symbol>
 </svg>
 
@@ -462,17 +471,20 @@ const QUIZ={1:{expl:"Present simple: rutinas, hechos y cosas permanentes (I work
   ["5G ___ lower latency than 4G.",["has","is having"],0,"«Have» como tener o poseer es de estado: present simple."]]}};
 const practicaURL=s=>s<=10?"https://test-english.com/grammar-points/b1/contents-b1/":"https://test-english.com/grammar-points/b2/contents-b2/";
 const quizSel={};
+let openQ=false, openV=false;
+const chev='<span class="chev" aria-hidden="true"><svg><use href="#i-chev"/></svg></span>';
+function foldHead(key,open,eyebrow,title,badge,col){return `<button type="button" class="foldhead" data-fold="${key}" aria-expanded="${open}"><span><span class="eyebrow" style="color:var(--${col})">${eyebrow}</span><h3>${esc(title)}</h3>${open?"":`<span class="hint">Toca para ${key==="q"?"practicar":"ver la lista"}</span>`}</span>${badge?`<span class="badge num">${badge}</span>`:"<span></span>"}${chev}</button>`}
 function practicaCard(s){
   const w=SEMANAS[s-1], q=QUIZ[s];
   const link=s===1?"https://test-english.com/grammar-points/b1/present-simple-present-continuous/":practicaURL(s), lvl=s<=10?"B1":"B2";
-  if(!q) return `<section class="card"><h3>Practica la gramática</h3><p class="note">Tema: <b>${esc(w[0])}</b>. Abre el índice de lecciones ${lvl} de Test-English y entra al tema de la semana: tiene explicación y ejercicios con corrección.</p><p style="margin:0"><a class="link" href="${link}" target="_blank" rel="noopener">Abrir lecciones ${lvl} en Test-English ↗</a></p></section>`;
+  if(!q) return `<section class="card fold" id="quiz" data-state="${openQ}" style="--fc:var(--c-gram);--fc-soft:var(--c-gram-soft)">${foldHead("q",openQ,"Práctica de gramática",w[0],"","c-gram")}${!openQ?"":`<p class="note">Tema: <b>${esc(w[0])}</b>. Abre el índice de lecciones ${lvl} de Test-English y entra al tema de la semana: tiene explicación y ejercicios con corrección.</p><p style="margin:0"><a class="link" href="${link}" target="_blank" rel="noopener">Abrir lecciones ${lvl} en Test-English ↗</a></p>`}</section>`;
   const sel=quizSel[s]||{}; const answered=Object.keys(sel).length, ok=q.qs.filter((x,i)=>sel[i]===x[2]).length;
-  return `<section class="card" id="quiz"><div class="dayhead"><h3>Practica: ${esc(w[0])}</h3>${answered?`<span class="score num">${ok}/${q.qs.length}</span>`:""}</div>
-    <p class="note">${esc(q.expl)}</p>
+  return `<section class="card fold" id="quiz" data-state="${openQ}" style="--fc:var(--c-gram);--fc-soft:var(--c-gram-soft)">${foldHead("q",openQ,"Práctica de gramática",w[0],answered?ok+"/"+q.qs.length:"","c-gram")}
+    ${!openQ?"":`<p class="note">${esc(q.expl)}</p>
     ${q.qs.map((x,i)=>{const a=sel[i];return `<div class="q"><span class="s">${i+1}. ${esc(x[0])}</span>
       <div class="opts">${x[1].map((o,j)=>`<button class="opt${a!==undefined?(j===x[2]?" right":(j===a?" wrong":"")):""}" data-q="${i}" data-o="${j}" ${a!==undefined?"disabled":""} type="button">${esc(o)}</button>`).join("")}</div>
       ${a!==undefined?`<span class="why">${a===x[2]?"Correcto. ":"Era «"+esc(x[1][x[2]])+"». "}${esc(x[3])}</span>`:""}</div>`}).join("")}
-    <div class="btnrow">${answered?'<button class="btn ghost" id="qreset" type="button">Repetir práctica</button>':""}<a class="link" href="${link}" target="_blank" rel="noopener" style="align-self:center">Más ejercicios en Test-English ↗</a></div>
+    <div class="btnrow">${answered?'<button class="btn ghost" id="qreset" type="button">Repetir práctica</button>':""}<a class="link" href="${link}" target="_blank" rel="noopener" style="align-self:center">Más ejercicios en Test-English ↗</a></div>`}
   </section>`;
 }
 function bindQuiz(el,s){
@@ -487,8 +499,9 @@ let vocabWeek=null;
 function vocabCard(s){
   const vw=vocabWeek||Math.min(s,22), list=VOCAB[vw]||[], sabidas=list.filter((x,i)=>state.vocab[vw+":"+i]).length;
   let tot=0,totOk=0;for(const k in VOCAB){VOCAB[k].forEach((x,i)=>{tot++;if(state.vocab[k+":"+i])totOk++})}
-  return `<section class="card" id="vocab">
-    <div class="dayhead"><div><span class="eyebrow" style="color:var(--c-vocab)">Vocabulario · semana ${vw}</span><h3>${esc(SEMANAS[vw-1][2])}</h3></div>
+  return `<section class="card fold" id="vocab" data-state="${openV}" style="--fc:var(--c-vocab);--fc-soft:var(--c-vocab-soft)">
+    ${foldHead("v",openV,"Vocabulario · semana "+vw,SEMANAS[vw-1][2],sabidas+"/"+list.length,"c-vocab")}
+    ${!openV?"":`<div class="dayhead"><span class="note">Cambiar de semana</span>
       <div class="arrows"><button class="iconbtn" id="vprev" aria-label="Lista anterior" ${vw===1?"disabled":""}>‹</button><button class="iconbtn" id="vnext" aria-label="Lista siguiente" ${vw===22?"disabled":""}>›</button></div></div>
     ${s>22&&!vocabWeek?'<p class="note">Estas semanas son de repaso: recorre las listas anteriores y repasa las palabras que aún no marcas.</p>':""}
     <div class="vbar"><div class="dayhead"><span class="note">${sabidas} de ${list.length} palabras de esta lista</span><span class="note num">${totOk}/${tot} en total</span></div><div class="bar" style="margin-top:4px"><span style="width:${list.length?sabidas/list.length*100:0}%"></span></div></div>
@@ -497,13 +510,14 @@ function vocabCard(s){
       <button class="know${on?" on":""}" data-v="${vw}:${i}" type="button" ${canWrite?"":"disabled"}>${on?"La sé ✓":"La sé"}</button>
       <span class="ex">${esc(x[2])}</span></li>`}).join("")}</ul>
     <div class="btnrow"><button class="btn ghost" id="vcopy" type="button">Copiar lista para Anki</button>${IN_VIEWER?"":'<button class="btn ghost" id="vdl" type="button">Descargar para Anki</button>'}</div>
-    <p class="note">Meta diaria: aprende 2 o 3 palabras de esta lista y súmalas a Anki. Usa cada una en una frase sobre tu trabajo.</p>
+    <p class="note">Meta diaria: aprende 2 o 3 palabras de esta lista y súmalas a Anki. Usa cada una en una frase sobre tu trabajo.</p>`}
   </section>`;
 }
 function bindVocab(el,s){
   const vw=vocabWeek||Math.min(s,22);
   el.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const k=b.dataset.v;if(state.vocab[k])delete state.vocab[k];else state.vocab[k]=true;
     persist();const y=window.scrollY;renderHoy();window.scrollTo(0,y)});
+  if(!el.querySelector("#vprev")) return;
   el.querySelector("#vprev").onclick=()=>{vocabWeek=Math.max(1,vw-1);renderHoy();document.getElementById("vocab").scrollIntoView()};
   el.querySelector("#vnext").onclick=()=>{vocabWeek=Math.min(22,vw+1);renderHoy();document.getElementById("vocab").scrollIntoView()};
   const txt=()=>(VOCAB[vw]||[]).map(x=>x[0]+"\t"+x[1]+"<br><i>"+x[2]+"</i>").join("\n");
@@ -532,9 +546,9 @@ function renderHoy(){
         <div><b>${p.done===p.total?"Día completo":"Tareas de hoy"}</b><div class="note">Unos ${mins} minutos en total</div></div>
       </div>
       <div class="topics">
-        <a class="topic" href="#quiz" style="--tc:var(--c-gram);--tc-soft:var(--c-gram-soft);color:inherit;text-decoration:none"><span class="eyebrow">Gramática</span><b>${esc(w[0])} <span style="color:var(--c-gram)">· practicar ↓</span></b></a>
+        <a class="topic" href="#quiz" data-open="q" style="--tc:var(--c-gram);--tc-soft:var(--c-gram-soft);color:inherit;text-decoration:none"><span class="eyebrow">Gramática</span><b>${esc(w[0])} <span style="color:var(--c-gram)">· practicar ↓</span></b></a>
         <div class="topic" style="--tc:var(--c-speak);--tc-soft:var(--c-speak-soft)"><span class="eyebrow">Hablar</span><b>${esc(w[1])}</b></div>
-        <a class="topic" href="#vocab" style="--tc:var(--c-vocab);--tc-soft:var(--c-vocab-soft);color:inherit;text-decoration:none"><span class="eyebrow">Vocabulario</span><b>${esc(w[2])} <span style="color:var(--c-vocab)">· ver lista ↓</span></b></a>
+        <a class="topic" href="#vocab" data-open="v" style="--tc:var(--c-vocab);--tc-soft:var(--c-vocab-soft);color:inherit;text-decoration:none"><span class="eyebrow">Vocabulario</span><b>${esc(w[2])} <span style="color:var(--c-vocab)">· ver lista ↓</span></b></a>
       </div>
       <ul class="tasks">${ts.map(t=>{const id=k+":"+t.id, on=!!state.checks[id];return `<li>
         <button type="button" class="task${on?" done":""}${t.main?" main":""}" data-k="${id}" role="checkbox" aria-checked="${on}" ${canWrite?"":"disabled"} style="--c:var(--${t.col==="flame"?"flame":"c-"+t.col});--c-soft:var(--${t.col==="flame"?"flame":"c-"+t.col}-soft)">
@@ -547,8 +561,13 @@ function renderHoy(){
     ${practicaCard(s)}
     ${vocabCard(s)}</div>`;
   bindQuiz(el,s);bindVocab(el,s);
-  el.querySelector("#prev").onclick=()=>{viewIdx=clampIdx(viewIdx-1);vocabWeek=null;renderHoy()};
-  el.querySelector("#next").onclick=()=>{viewIdx=clampIdx(viewIdx+1);vocabWeek=null;renderHoy()};
+  el.querySelectorAll("[data-fold]").forEach(b=>b.onclick=()=>{const k=b.dataset.fold;if(k==="q")openQ=!openQ;else openV=!openV;
+    const sec=b.closest("section"), top=sec.getBoundingClientRect().top;renderHoy();
+    const n=document.getElementById(k==="q"?"quiz":"vocab");if(n){const d=n.getBoundingClientRect().top-top;if(d)window.scrollBy(0,d)}});
+  el.querySelectorAll("a[data-open]").forEach(a=>a.onclick=e=>{e.preventDefault();const k=a.dataset.open;if(k==="q")openQ=true;else openV=true;
+    renderHoy();document.getElementById(k==="q"?"quiz":"vocab").scrollIntoView({behavior:"smooth",block:"start"})});
+  el.querySelector("#prev").onclick=()=>{viewIdx=clampIdx(viewIdx-1);vocabWeek=null;openQ=openV=false;renderHoy()};
+  el.querySelector("#next").onclick=()=>{viewIdx=clampIdx(viewIdx+1);vocabWeek=null;openQ=openV=false;renderHoy()};
   const hb=el.querySelector("#hoyb"); if(hb) hb.onclick=()=>{viewIdx=clampIdx(dayIndex(today()));renderHoy()};
   el.querySelectorAll("button[data-k]").forEach(cb=>cb.onclick=()=>{
     const before=racha().n, wasFull=prog(viewIdx).done===prog(viewIdx).total, k=cb.dataset.k;
