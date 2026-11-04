@@ -216,6 +216,38 @@ details summary{cursor:pointer;font-weight:600}
 .chev svg{width:16px;height:16px}
 .fold[data-state="true"] .chev{transform:rotate(180deg)}
 .fold .hint{font-size:13px;color:var(--muted)}
+/* enlaces de tareas */
+.tlinks{display:flex;flex-wrap:wrap;gap:6px;padding:8px 2px 2px 44px}
+a.rlink,button.rlink{font:600 12.5px var(--body);padding:5px 11px;border-radius:999px;background:var(--c-soft);color:var(--c);text-decoration:none;border:0;cursor:pointer;touch-action:manipulation}
+a.rlink.wk{background:var(--c);color:var(--surface)}
+/* grabadora */
+.recbox{display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px;border-radius:16px;background:var(--c-speak-soft)}
+.recbtn{width:84px;height:84px;border-radius:50%;border:0;background:var(--c-speak);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 20px -8px var(--c-speak);touch-action:manipulation}
+.recbtn svg{width:34px;height:34px}
+.recbtn.on{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c-speak) 55%,transparent)}50%{box-shadow:0 0 0 14px color-mix(in srgb,var(--c-speak) 0%,transparent)}}
+.rectime{font:800 26px var(--display);color:var(--c-speak)}
+.guide{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+audio{width:100%}
+.fb{display:flex;flex-direction:column;gap:8px}
+.fbi{border-radius:14px;padding:10px 12px;background:var(--surface2);display:flex;flex-direction:column;gap:4px}
+.fbi .bad{color:var(--c-speak);text-decoration:line-through}
+.fbi .good{font-weight:700;color:var(--good)}
+.fbi .why{font-size:13.5px;color:var(--muted)}
+.lvl{display:inline-block;font:800 15px var(--display);padding:3px 12px;border-radius:999px;background:var(--c-gram-soft);color:var(--c-gram)}
+.recs{display:flex;flex-direction:column;gap:8px}
+.reci{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--surface2);font-size:13.5px}
+/* pronunciación */
+.target{font:700 19px/1.45 var(--display);padding:14px;border-radius:14px;background:var(--c-shadow-soft)}
+.words{display:flex;flex-wrap:wrap;gap:6px}
+.wd2{font:600 15px var(--body);padding:4px 10px;border-radius:10px;border:0;cursor:pointer;touch-action:manipulation}
+.wd2.ok{background:var(--good-soft);color:var(--good)}
+.wd2.bad{background:var(--c-speak-soft);color:var(--c-speak);text-decoration:underline;text-decoration-style:wavy}
+.pscore{font:800 30px var(--display)}
+.tip{border-radius:12px;padding:10px 12px;background:var(--surface2);font-size:14px;display:flex;flex-direction:column;gap:4px}
+.micbig{width:64px;height:64px;border-radius:50%;border:0;background:var(--c-shadow);color:#fff;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+.micbig svg{width:28px;height:28px}.micbig.on{animation:pulse 1.2s ease-in-out infinite}
+.prow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 /* práctica */
 .q{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--surface2)}
 .q .s{font-weight:600}
@@ -265,6 +297,9 @@ a.link{color:var(--c-gram);font-weight:600}
   <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></g></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></symbol>
   <symbol id="i-auto" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/></g><path fill="currentColor" d="M12 3.5a8.5 8.5 0 0 1 0 17Z"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></g></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3" fill="currentColor"/></symbol>
+  <symbol id="i-spk" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5 9 4l6 2.5L20 4v13.5L15 20l-6-2.5L4 20Z"/><path d="M9 4v13.5M15 6.5V20"/></g></symbol>
 </svg>
@@ -399,11 +434,11 @@ function tareas(idx){
 }
 
 // ---------- estado ----------
-let state={checks:{},hitos:{},scores:[],errores:[],vocab:{}};
+let state={checks:{},hitos:{},scores:[],errores:[],vocab:{},pron:{}};
 let ref=null, mode="local", writing=Promise.resolve(), canWrite=true;
 const LS="ruta-ingles-v1";
 const IN_VIEWER=!!(window.claude&&window.claude.use);
-function loadLocal(){try{const s=localStorage.getItem(LS);if(s){const d=JSON.parse(s);state={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{}}}}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem(LS);if(s){const d=JSON.parse(s);state={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{}}}}catch(e){}}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 function setStatus(t,warn){const el=document.getElementById("status");el.textContent=t;el.classList.toggle("warn",!!warn)}
 let pending=0, lastEdit=0;
@@ -501,10 +536,25 @@ const QUIZ={1:{expl:"Present simple: rutinas, hechos y cosas permanentes (I work
   ["What ___ right now? I can't see you online.",["do you do","are you doing"],1,"Pregunta sobre este momento: present continuous."],
   ["5G ___ lower latency than 4G.",["has","is having"],0,"«Have» como tener o poseer es de estado: present simple."]]}};
 const practicaURL=s=>s<=10?"https://test-english.com/grammar-points/b1/contents-b1/":"https://test-english.com/grammar-points/b2/contents-b2/";
+const YT=["what does an RF engineer do","telecom engineer career story","cell tower site visit explained","telecom project planning rollout","4G vs 5G explained","telecom tower climbing safety","mobile network troubleshooting KPI","how to give a short presentation in English","network design coverage vs capacity","how a new cell site is deployed","English for meetings useful phrases","mobile network KPIs explained","LTE drive test explained","RF optimization case study","python automation for network engineers","indoor coverage DAS small cells explained","how to present a report in English","tell me about yourself interview engineer","describe a project you are proud of interview","describe a difficult problem you solved interview","how to prioritize tasks interview answer","future of 5G in Latin America","why do you want this job interview answer","Cambridge B2 First speaking test example","mock job interview in English engineer","Cambridge C1 Advanced speaking test example"];
+const ytURL=s=>"https://www.youtube.com/results?search_query="+encodeURIComponent(YT[s-1]);
+const FUENTES={
+ listening:[["6 Minute English (BBC)","https://www.bbc.co.uk/learningenglish/english/features/6-minute-english"],["VOA Learning English","https://learningenglish.voanews.com/"],["All Ears English","https://www.allearsenglish.com/"],["Business English Pod","https://businessenglishpod.com/"],["ELLLO","https://www.elllo.org/"]],
+ shadowing:[["6 Minute English con transcripción","https://www.bbc.co.uk/learningenglish/english/features/6-minute-english"],["VOA Learning English (lento)","https://learningenglish.voanews.com/"]]};
+function taskLinks(t,s){
+  if(t.id==="listening") return `<div class="tlinks" style="--c:var(--c-listen);--c-soft:var(--c-listen-soft)"><a class="rlink wk" href="${ytURL(s)}" target="_blank" rel="noopener">Video de la semana ↗</a>${FUENTES.listening.map(f=>`<a class="rlink" href="${f[1]}" target="_blank" rel="noopener">${f[0]} ↗</a>`).join("")}</div>`;
+  if(t.id==="shadowing") return `<div class="tlinks" style="--c:var(--c-shadow);--c-soft:var(--c-shadow-soft)"><a class="rlink wk" href="#pron" data-open="p">Practicar pronunciación ↓</a>${FUENTES.shadowing.map(f=>`<a class="rlink" href="${f[1]}" target="_blank" rel="noopener">${f[0]} ↗</a>`).join("")}</div>`;
+  if(t.id==="hablar"||(t.main&&/Speaking|Entrevista|Simulacro de Speaking/.test(t.t))) return `<div class="tlinks" style="--c:var(--c-speak);--c-soft:var(--c-speak-soft)"><a class="rlink wk" href="#grab" data-open="r">Grabarme y revisar ↓</a></div>`;
+  if(t.main&&/Listening/.test(t.t)) return `<div class="tlinks" style="--c:var(--c-listen);--c-soft:var(--c-listen-soft)"><a class="rlink wk" href="${ytURL(s)}" target="_blank" rel="noopener">Video de la semana ↗</a><a class="rlink" href="${FUENTES.listening[0][1]}" target="_blank" rel="noopener">6 Minute English ↗</a></div>`;
+  return "";
+}
 const quizSel={};
-let openQ=false, openV=false;
+let openQ=false, openV=false, openR=false, openP=false;
+const FOLDID={q:"quiz",v:"vocab",r:"grab",p:"pron"};
+const setOpen=(k,v)=>{if(k==="q")openQ=v;else if(k==="v")openV=v;else if(k==="r")openR=v;else openP=v};
+const isOpen=k=>k==="q"?openQ:k==="v"?openV:k==="r"?openR:openP;
 const chev='<span class="chev" aria-hidden="true"><svg><use href="#i-chev"/></svg></span>';
-function foldHead(key,open,eyebrow,title,badge,col){return `<button type="button" class="foldhead" data-fold="${key}" aria-expanded="${open}"><span><span class="eyebrow" style="color:var(--${col})">${eyebrow}</span><h3>${esc(title)}</h3>${open?"":`<span class="hint">Toca para ${key==="q"?"practicar":"ver la lista"}</span>`}</span>${badge?`<span class="badge num">${badge}</span>`:"<span></span>"}${chev}</button>`}
+function foldHead(key,open,eyebrow,title,badge,col){return `<button type="button" class="foldhead" data-fold="${key}" aria-expanded="${open}"><span><span class="eyebrow" style="color:var(--${col})">${eyebrow}</span><h3>${esc(title)}</h3>${open?"":`<span class="hint">Toca para ${key==="q"?"practicar":key==="v"?"ver la lista":key==="r"?"grabarte":"practicar tu pronunciación"}</span>`}</span>${badge?`<span class="badge num">${badge}</span>`:"<span></span>"}${chev}</button>`}
 function practicaCard(s){
   const w=SEMANAS[s-1], q=QUIZ[s];
   const link=s===1?"https://test-english.com/grammar-points/b1/present-simple-present-continuous/":practicaURL(s), lvl=s<=10?"B1":"B2";
@@ -556,6 +606,207 @@ function bindVocab(el,s){
   const dl=el.querySelector("#vdl");if(dl)dl.onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt()],{type:"text/plain"}));a.download="vocabulario-semana-"+vw+".txt";document.body.appendChild(a);a.click();a.remove()};
 }
 
+// ---------- grabadora y revisión ----------
+const REGLAS=[
+ [/\bi have (\d+) years\b/i,"I have N years","I am N years old","Vocabulario","La edad se dice con «be»: I am 28 years old."],
+ [/\bi'?m (\d+) years\b(?! old)/i,"I'm N years","I'm N years old","Vocabulario","Agrega «old» al decir tu edad."],
+ [/\bdepends? of\b/i,"depend of","depend on","Preposiciones","Siempre «depend on»."],
+ [/\bexplain me\b/i,"explain me","explain (it) to me","Orden de palabras","«Explain something to someone»."],
+ [/\b(i am|i'm|we are) agree\b/i,"I am agree","I agree","Concordancia","«Agree» ya es verbo: no lleva «am»."],
+ [/\b(i|we) (work|live|study) (here |there |in \w+ |at \w+ )?(since|for (\d+|two|three|four|five|many|several) (years|months))\b/i,"I work here since/for…","I have worked here since/for…","Tiempos verbales","Algo que empezó y sigue: present perfect."],
+ [/\bsince (\d+|two|three|four|five) (years|months|weeks|days)\b/i,"since 2 years","for 2 years","Preposiciones","Duración con «for»; punto de inicio con «since»."],
+ [/\bpeople is\b/i,"people is","people are","Concordancia","«People» es plural."],
+ [/\b(informations|advices|equipments|feedbacks)\b/i,"informations","information","Concordancia","Ese sustantivo no tiene plural en inglés."],
+ [/\bmake (a|some|many) questions?\b/i,"make a question","ask a question","Vocabulario","Se dice «ask a question»."],
+ [/\bassist(ed|ing)? (to )?(the |a )?(meeting|class|course|event)/i,"assist the meeting","attend the meeting","Vocabulario","«Asistir a» = attend."],
+ [/\bdid(n't| not) (went|came|saw|had|did|made|was|were|got|took|\w+ed)\b/i,"didn't went","didn't go","Tiempos verbales","Después de «did/didn't», el verbo va en forma base."],
+ [/\bmore (better|faster|easier|bigger|cheaper|worse)\b/i,"more better","better","Concordancia","El comparativo ya incluye «more»."],
+ [/\b(he|she|it) (work|have|go|do|want|need|like|live|use|make)\b/i,"he work","he works","Concordancia","Tercera persona singular en presente: -s (has, does, goes)."],
+ [/\bis (very )?(important|necessary|difficult|possible|easy) the\b/i,"is important the…","The … is important","Orden de palabras","En inglés el sujeto va primero."],
+ [/\b(can|must|should|will) to\b/i,"can to","can (sin «to»)","Concordancia","Después de un modal va el verbo sin «to»."],
+ [/\bin (monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?\b/i,"in Monday","on Monday","Preposiciones","Días de la semana con «on»."],
+ [/\bin the night\b/i,"in the night","at night","Preposiciones","Se dice «at night»."],
+ [/\bdiscuss about\b/i,"discuss about","discuss","Preposiciones","«Discuss» no lleva «about»."],
+ [/\bactually\b/i,"actually","currently (si quisiste decir «actualmente»)","Vocabulario","«Actually» significa «en realidad»."]];
+function revisarLocal(txt){
+  const out=[];
+  REGLAS.forEach(r=>{const m=txt.match(r[0]);if(m)out.push({dijiste:m[0],correcto:r[2].replace("N",m[1]&&/^\d+$/.test(m[1])?m[1]:"N"),tipo:r[3],explicacion:r[4]})});
+  return out;
+}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const canRecord=!IN_VIEWER&&!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+let rec={status:"idle",t0:0,elapsed:0,url:null,blob:null,txt:"",fb:null,busy:false,error:""}, recMR=null, recSR=null, recTimer=null, recChunks=[], recList=[], recPlay={};
+let sampleFn=null; if(IN_VIEWER) window.claude.use("sample").then(f=>{sampleFn=f;}).catch(()=>{});
+// almacenamiento local de grabaciones (IndexedDB, solo en este teléfono)
+const idb=(()=>{let p=null;const open=()=>p||(p=new Promise((res,rej)=>{try{const r=indexedDB.open("dailyenglish",1);r.onupgradeneeded=()=>r.result.createObjectStore("rec",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}}));
+  const tx=(mode,fn)=>open().then(db=>new Promise((res,rej)=>{const t=db.transaction("rec",mode),st=t.objectStore("rec"),out=fn(st);t.oncomplete=()=>res(out&&out.result!==undefined?out.result:out);t.onerror=()=>rej(t.error)}));
+  return {all:()=>tx("readonly",st=>st.getAll()),put:v=>tx("readwrite",st=>st.put(v)),del:id=>tx("readwrite",st=>st.delete(id))};})();
+function cargarGrabaciones(){if(!canRecord)return;idb.all().then(l=>{recList=(l||[]).sort((a,b)=>b.id-a.id);if(openR){const y=scrollY;renderHoy();scrollTo(0,y)}}).catch(()=>{})}
+cargarGrabaciones();
+const mmss=ms=>{const s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+function recCard(s){
+  const w=SEMANAS[s-1];
+  const head=foldHead("r",openR,"Speaking · grábate y revisa",w[1],recList.length?recList.length+" grab.":"","c-speak");
+  if(!openR) return `<section class="card fold" id="grab" data-state="false" style="--fc:var(--c-speak);--fc-soft:var(--c-speak-soft)">${head}</section>`;
+  const fb=rec.fb;
+  return `<section class="card fold" id="grab" data-state="true" style="--fc:var(--c-speak);--fc-soft:var(--c-speak-soft)">${head}
+    <div><span class="eyebrow">Habla 2 minutos. Guíate con esto:</span>
+      <ol class="guide" style="margin-top:6px"><li>Presenta el tema: <b>${esc(w[1])}</b>.</li><li>Da un ejemplo real de tu trabajo.</li><li>Cierra con tu opinión o lo que aprendiste.</li><li>Intenta usar <b>${esc(w[0])}</b> y 3 palabras de la lista de vocabulario.</li></ol></div>
+    ${canRecord?`<div class="recbox">
+      <button type="button" class="recbtn${rec.status==="recording"?" on":""}" id="recbtn" aria-label="${rec.status==="recording"?"Detener":"Grabar"}"><svg><use href="#${rec.status==="recording"?"i-stop":"i-mic"}"/></svg></button>
+      <span class="rectime num" id="rectime">${mmss(rec.status==="recording"?Date.now()-rec.t0:rec.elapsed)}</span>
+      <span class="note">${rec.status==="recording"?"Grabando… toca para detener":rec.status==="done"?"Escúchate y revisa abajo":"Toca para empezar a grabar"}</span>
+      ${rec.error?`<span class="note" style="color:var(--c-speak)">${esc(rec.error)}</span>`:""}
+      ${rec.url&&rec.status==="done"?`<audio controls src="${rec.url}"></audio>`:""}
+    </div>`:`<p class="note">La grabadora funciona en la app <b>DailyEnglish</b> instalada en tu iPhone. Aquí puedes dictar o escribir lo que dijiste y pedir la revisión.</p>`}
+    <div><label class="note" for="rectxt">Lo que dijiste (en inglés)</label>
+      <textarea id="rectxt" style="min-height:110px;font:500 14.5px var(--body)" placeholder="${SR&&canRecord?"Aparece aquí al grabar. Si no aparece, toca el micrófono del teclado y repítelo.":"Toca el micrófono del teclado y habla, o escríbelo."}">${esc(rec.txt)}</textarea></div>
+    <div class="btnrow">
+      <button class="btn" id="revloc" type="button">Revisar errores</button>
+      <button class="btn ghost" id="revcl" type="button" ${rec.busy?"disabled":""}>${rec.busy?"Revisando…":sampleFn?"Revisión completa con Claude":"Copiar para revisar con Claude"}</button>
+    </div>
+    ${fb?`<div class="fb">
+      ${fb.nivel?`<div><span class="lvl">Nivel estimado: ${esc(fb.nivel)}</span></div>`:""}
+      ${fb.resumen?`<p class="note" style="color:var(--ink)">${esc(fb.resumen)}</p>`:""}
+      ${fb.errores.length?fb.errores.map((e,i)=>`<div class="fbi"><span><span class="bad">${esc(e.dijiste)}</span> → <span class="good">${esc(e.correcto)}</span></span><span class="why">${esc(e.tipo||"")}${e.tipo?". ":""}${esc(e.explicacion||"")}</span><div><button class="sbtn" data-adderr="${i}" type="button">Agregar a Errores</button></div></div>`).join("")
+        :`<p class="note">${fb.fuente==="local"?"No encontré errores típicos en tu texto. Para una revisión completa, usa la revisión con Claude.":"Sin errores importantes. ¡Muy bien!"}</p>`}
+      ${fb.mejorada?`<div class="fbi"><span class="eyebrow">Cómo sonaría mejor</span><span>${esc(fb.mejorada)}</span></div>`:""}
+      ${fb.consejo?`<p class="note">${esc(fb.consejo)}</p>`:""}
+      ${fb.fuente==="local"?'<p class="note">Esta revisión rápida busca errores típicos de hispanohablantes y funciona sin internet. No evalúa pronunciación.</p>':""}
+    </div>`:""}
+    ${canRecord&&recList.length?`<div><span class="eyebrow">Tus grabaciones</span><div class="recs" style="margin-top:6px">${recList.slice(0,8).map(r=>`<div class="reci"><span>${fecha(new Date(r.id))} · ${mmss(r.dur)}${r.txt?" · con texto":""}</span><span class="acts"><button class="sbtn" data-play="${r.id}" type="button">Escuchar</button> <button class="sbtn" data-delrec="${r.id}" type="button">Borrar</button></span>${recPlay[r.id]?`<audio controls autoplay src="${recPlay[r.id]}" style="grid-column:1/-1"></audio>`:""}</div>`).join("")}</div><p class="note" style="margin-top:6px">Las grabaciones se guardan solo en este teléfono.</p></div>`:""}
+  </section>`;
+}
+function rerenderRec(){const y=scrollY;renderHoy();scrollTo(0,y)}
+async function empezarGrabacion(){
+  rec.error="";
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const type=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
+    recMR=new MediaRecorder(stream,type?{mimeType:type}:undefined); recChunks=[];
+    recMR.ondataavailable=e=>{if(e.data&&e.data.size)recChunks.push(e.data)};
+    recMR.onstop=()=>{stream.getTracks().forEach(t=>t.stop());
+      rec.blob=new Blob(recChunks,{type:recMR.mimeType||type||"audio/mp4"}); if(rec.url)URL.revokeObjectURL(rec.url); rec.url=URL.createObjectURL(rec.blob);
+      rec.status="done"; rec.elapsed=Date.now()-rec.t0;
+      const item={id:rec.t0,dur:rec.elapsed,blob:rec.blob,txt:rec.txt};
+      idb.put(item).then(()=>idb.all()).then(l=>{l.sort((a,b)=>b.id-a.id);l.slice(15).forEach(x=>idb.del(x.id));recList=l.slice(0,15);rerenderRec()}).catch(()=>rerenderRec());
+      rerenderRec()};
+    recMR.start(); rec.status="recording"; rec.t0=Date.now(); rec.fb=null; rec.txt="";
+    if(SR){try{recSR=new SR();recSR.lang="en-US";recSR.continuous=true;recSR.interimResults=true;let fin="";
+      recSR.onresult=ev=>{let inter="";for(let i=ev.resultIndex;i<ev.results.length;i++){const r=ev.results[i];if(r.isFinal)fin+=r[0].transcript+" ";else inter+=r[0].transcript}
+        rec.txt=(fin+inter).trim();const ta=document.getElementById("rectxt");if(ta)ta.value=rec.txt};
+      recSR.onend=()=>{if(rec.status==="recording"){try{recSR.start()}catch(e){}}};
+      recSR.onerror=()=>{};recSR.start()}catch(e){recSR=null}}
+    clearInterval(recTimer);recTimer=setInterval(()=>{const el=document.getElementById("rectime");if(el)el.textContent=mmss(Date.now()-rec.t0);if(Date.now()-rec.t0>180000)detenerGrabacion()},500);
+    rerenderRec();
+  }catch(e){rec.error="No pude usar el micrófono. Revisa en Ajustes > Safari > Micrófono que esté permitido.";rec.status="idle";rerenderRec()}
+}
+function detenerGrabacion(){clearInterval(recTimer);rec.status="stopping";try{recSR&&recSR.stop()}catch(e){}recSR=null;try{recMR&&recMR.state!=="inactive"&&recMR.stop()}catch(e){}}
+function promptRevision(txt,s){const w=SEMANAS[s-1];return `Eres un profesor de inglés que prepara a un ingeniero de RF peruano (nivel intermedio) para Cambridge B2/C1 y entrevistas de trabajo.
+Tema del speaking: "${w[1]}". Gramática de la semana: "${w[0]}".
+Esta es la transcripción de lo que dijo (viene de reconocimiento de voz; ignora la puntuación y las mayúsculas):
+"""${txt}"""
+Encuentra los errores de gramática, vocabulario y naturalidad (máximo 8, los más importantes primero). Escribe las explicaciones en español, cortas.
+Responde SOLO con JSON con esta forma:
+{"nivel":"B1|B2|C1","resumen":"1-2 frases en español sobre cómo le fue","errores":[{"dijiste":"frase exacta que dijo","correcto":"cómo debería decirse","tipo":"Tiempos verbales|Preposiciones|Vocabulario|Artículos|Concordancia|Orden de palabras|Otro","explicacion":"por qué"}],"mejorada":"su texto completo reescrito de forma natural en inglés","consejo":"un consejo concreto en español para la próxima grabación"}`}
+function bindRec(el,s){
+  const b=el.querySelector("#recbtn"); if(b) b.onclick=()=>{if(rec.status==="recording")detenerGrabacion();else empezarGrabacion()};
+  const ta=el.querySelector("#rectxt"); if(ta) ta.oninput=()=>{rec.txt=ta.value};
+  const rl=el.querySelector("#revloc"); if(rl) rl.onclick=()=>{rec.txt=ta.value.trim();if(!rec.txt){toast("Primero graba, dicta o escribe lo que dijiste");return}
+    rec.fb={fuente:"local",errores:revisarLocal(rec.txt)};rerenderRec()};
+  const rc=el.querySelector("#revcl"); if(rc) rc.onclick=async()=>{rec.txt=ta.value.trim();if(!rec.txt){toast("Primero graba, dicta o escribe lo que dijiste");return}
+    const pr=promptRevision(rec.txt,s);
+    if(!sampleFn){try{await navigator.clipboard.writeText(pr);toast("Copiado. Pégalo en un chat con Claude")}catch(e){ta.value=pr;ta.select();toast("Copia el texto del recuadro y pégalo en Claude")}return}
+    rec.busy=true;rerenderRec();
+    try{const d=await sampleFn.json(pr,{modelTier:"default"});rec.fb={fuente:"claude",nivel:d.nivel,resumen:d.resumen,errores:Array.isArray(d.errores)?d.errores:[],mejorada:d.mejorada,consejo:d.consejo}}
+    catch(e){toast(e&&e.code==="not_granted"?"Necesito tu permiso para usar Claude":"No se pudo revisar ahora. Usa «Revisar errores».")}
+    rec.busy=false;rerenderRec()};
+  el.querySelectorAll("[data-adderr]").forEach(x=>x.onclick=()=>{const e=rec.fb.errores[+x.dataset.adderr];
+    const ex=state.errores.find(z=>z.mal.toLowerCase()===String(e.dijiste).toLowerCase());
+    if(ex){ex.n=(ex.n||1)+1;ex.ok=false;ex.u=new Date().toISOString()}else state.errores.push({id:nid(),mal:String(e.dijiste),bien:String(e.correcto),cat:CATS.includes(e.tipo)?e.tipo:"Otro",n:1,f:key(today()),ok:false,u:new Date().toISOString()});
+    persist();x.disabled=true;x.textContent="Agregado";toast("Agregado a tus errores")});
+  el.querySelectorAll("[data-play]").forEach(x=>x.onclick=()=>{const r=recList.find(z=>z.id===+x.dataset.play);if(!r)return;
+    if(recPlay[r.id]){URL.revokeObjectURL(recPlay[r.id]);delete recPlay[r.id]}else recPlay[r.id]=URL.createObjectURL(r.blob);rerenderRec()});
+  el.querySelectorAll("[data-delrec]").forEach(x=>x.onclick=()=>{const id=+x.dataset.delrec;idb.del(id).then(()=>{recList=recList.filter(z=>z.id!==id);rerenderRec()})});
+}
+
+// ---------- pronunciación ----------
+const pron={i:0,res:null,listening:false,heard:"",sel:null};
+const CONTR={"i'm":"i am","you're":"you are","we're":"we are","they're":"they are","it's":"it is","that's":"that is","there's":"there is","can't":"cannot","don't":"do not","doesn't":"does not","didn't":"did not","isn't":"is not","won't":"will not","i'll":"i will","we'll":"we will","let's":"let us","i'd":"i would","what's":"what is"};
+function toks(t){return t.toLowerCase().replace(/[’`]/g,"'").replace(/(\d),(\d)/g,"$1$2").replace(/[-/]/g," ").replace(/[^a-z0-9' %.]/g," ").replace(/\.(?!\d)/g," ").split(/\s+/).filter(Boolean).flatMap(w=>(CONTR[w]||w).split(" ")).map(w=>w.replace(/^'+|'+$/g,"")).filter(Boolean)}
+function comparar(target,said){
+  const T=toks(target), S=toks(said), n=T.length, m=S.length, L=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=T[i]===S[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  const ok=new Array(n).fill(false);let i=0,j=0;while(i<n&&j<m){if(T[i]===S[j]){ok[i]=true;i++;j++}else if(L[i+1][j]>=L[i][j+1])i++;else j++}
+  T.forEach((w,k)=>{if(/\d/.test(w)&&!ok[k])ok[k]=S.some(x=>x.replace(/\D/g,"")===w.replace(/\D/g,""))});
+  return {T,ok,score:n?Math.round(ok.filter(Boolean).length/n*100):0};
+}
+function tipPara(w){
+  const t=[];
+  if(/^s[ptkcmnlw]/.test(w))t.push("No agregues «e» al inicio: s-"+w.slice(1)+", no «e-"+w+"».");
+  if(/[^e]ed$/.test(w)||/eed$/.test(w)===false&&/ed$/.test(w))t.push("La -ed final suena /t/ (worked), /d/ (planned) o /id/ solo después de t o d (needed).");
+  if(/th/.test(w))t.push("En «th» pon la lengua entre los dientes y sopla.");
+  if(/^v|v/.test(w))t.push("La «v» se hace con los dientes sobre el labio inferior; no la digas como «b».");
+  if(/^h/.test(w)&&!/^(hour|honest)/.test(w))t.push("La «h» se escucha: un soplo suave, como una «j» muy ligera.");
+  if(/^y/.test(w))t.push("La «y» inicial es suave: «yes», no «lles».");
+  if(/^w|wh/.test(w))t.push("La «w» es como una «u» rápida con labios redondos, no «gu».");
+  if(/tion$/.test(w))t.push("La terminación -tion suena «shən».");
+  if(/[^s]s$/.test(w)&&w.length>3)t.push("Pronuncia la -s final; en español solemos comerla.");
+  if(/(ee|ea)/.test(w))t.push("La «ee/ea» es una «i» larga; alárgala un poco.");
+  if(/^i[^aeiou]/.test(w)||/\bi[^aeiou]/.test(w))t.push("La «i» corta (it, is) es más relajada que la «i» española.");
+  return t.length?t.slice(0,2):["Escúchala lento, sepárala en sílabas y repítela 3 veces."];
+}
+function hablar(txt,rate){try{if(!window.speechSynthesis){toast("Tu navegador no puede leer en voz alta");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="en-US";u.rate=rate||.9;
+  const v=speechSynthesis.getVoices().find(v=>/en[-_]US/i.test(v.lang)&&/Samantha|Google|Natural|Premium|Enhanced/i.test(v.name))||speechSynthesis.getVoices().find(v=>/^en[-_]US/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+const pronList=s=>(VOCAB[Math.min(s,22)]||[]).map(x=>x[2]);
+function pronCard(s){
+  const L=pronList(s), sw=Math.min(s,22), done=L.filter((x,i)=>(state.pron[sw+":"+i]||0)>=90).length;
+  const head=foldHead("p",openP,"Pronunciación · semana "+sw,"Di frases de tu trabajo en voz alta",done+"/"+L.length,"c-shadow");
+  if(!openP) return `<section class="card fold" id="pron" data-state="false" style="--fc:var(--c-shadow);--fc-soft:var(--c-shadow-soft)">${head}</section>`;
+  const i=Math.min(pron.i,L.length-1), target=L[i]||"", best=state.pron[sw+":"+i], r=pron.res;
+  return `<section class="card fold" id="pron" data-state="true" style="--fc:var(--c-shadow);--fc-soft:var(--c-shadow-soft)">${head}
+    <div class="dayhead"><span class="note">Frase ${i+1} de ${L.length}${best!=null?" · tu mejor: "+best+"%":""}</span>
+      <div class="arrows"><button class="iconbtn" id="pprev" aria-label="Frase anterior" ${i===0?"disabled":""}>‹</button><button class="iconbtn" id="pnext" aria-label="Frase siguiente" ${i>=L.length-1?"disabled":""}>›</button></div></div>
+    <div class="target">${esc(target)}</div>
+    <div class="prow"><button class="btn ghost" id="plisten" type="button">🔊 Escuchar</button><button class="btn ghost" id="pslow" type="button">Lento</button></div>
+    <div class="prow">${SR?`<button class="micbig${pron.listening?" on":""}" id="pmic" type="button" aria-label="${pron.listening?"Detener":"Decir la frase"}"><svg><use href="#${pron.listening?"i-stop":"i-mic"}"/></svg></button><span class="note">${pron.listening?"Escuchando… di la frase":"Toca y di la frase"}</span>`:`<span class="note">Toca el recuadro, luego el <b>micrófono del teclado</b>, y di la frase.</span>`}</div>
+    <textarea id="pheard" style="min-height:64px;font:500 14.5px var(--body)" placeholder="Aquí aparece lo que el celular entendió">${esc(pron.heard)}</textarea>
+    <div><button class="btn" id="pcheck" type="button">Comparar</button></div>
+    ${r?`<div class="fb">
+      <div class="prow"><span class="pscore num" style="color:${r.score>=90?"var(--good)":r.score>=70?"var(--c-vocab)":"var(--c-speak)"}">${r.score}%</span><span class="note">${r.score>=90?"¡Se te entendió muy bien!":r.score>=70?"Bien. Repite las palabras en rojo.":"Varias palabras no se entendieron. Escucha y vuelve a intentar."}</span></div>
+      <div class="words">${r.T.map((w,k)=>`<button type="button" class="wd2 ${r.ok[k]?"ok":"bad"}" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>
+      ${pron.sel?`<div class="tip"><b>${esc(pron.sel)}</b> <button class="sbtn" id="psay" type="button" style="align-self:flex-start">🔊 Escuchar palabra</button>${tipPara(pron.sel).map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:(r.ok.some(x=>!x)?'<p class="note">Toca una palabra en rojo para escucharla y ver un consejo.</p>':"")}
+    </div>`:""}
+    <p class="note">Las palabras en rojo son las que el celular no reconoció: suele ser señal de que esa pronunciación no se entiende bien. No mide tu acento con detalle.</p>
+  </section>`;
+}
+let pronSR=null;
+function bindPron(el,s){
+  if(!el.querySelector("#pheard")) return;
+  const L=pronList(s), sw=Math.min(s,22), i=Math.min(pron.i,L.length-1), target=L[i];
+  const ta=el.querySelector("#pheard"); ta.oninput=()=>{pron.heard=ta.value};
+  el.querySelector("#pprev").onclick=()=>{pron.i=Math.max(0,i-1);pron.res=null;pron.heard="";pron.sel=null;rerenderRec()};
+  el.querySelector("#pnext").onclick=()=>{pron.i=Math.min(L.length-1,i+1);pron.res=null;pron.heard="";pron.sel=null;rerenderRec()};
+  el.querySelector("#plisten").onclick=()=>hablar(target,.9);
+  el.querySelector("#pslow").onclick=()=>hablar(target,.6);
+  const check=()=>{pron.heard=ta.value.trim();if(!pron.heard){toast("Primero di la frase");return}
+    pron.res=comparar(target,pron.heard);pron.sel=null;const k=sw+":"+i;
+    if(pron.res.score>(state.pron[k]||0)){state.pron[k]=pron.res.score;persist()}
+    if(pron.res.score>=90)toast("¡Muy bien!");rerenderRec()};
+  el.querySelector("#pcheck").onclick=check;
+  el.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{pron.sel=b.dataset.w;hablar(pron.sel,.7);rerenderRec()});
+  const ps=el.querySelector("#psay");if(ps)ps.onclick=()=>hablar(pron.sel,.6);
+  const mic=el.querySelector("#pmic");
+  if(mic) mic.onclick=()=>{
+    if(pron.listening){try{pronSR&&pronSR.stop()}catch(e){}return}
+    try{pronSR=new SR();pronSR.lang="en-US";pronSR.interimResults=true;pronSR.continuous=false;
+      pronSR.onresult=ev=>{let t="";for(let k=0;k<ev.results.length;k++)t+=ev.results[k][0].transcript;pron.heard=t;const x=document.getElementById("pheard");if(x)x.value=t};
+      pronSR.onend=()=>{pron.listening=false;if(pron.heard.trim()){const x=document.getElementById("pheard");if(x)x.value=pron.heard;check()}else rerenderRec()};
+      pronSR.onerror=e=>{pron.listening=false;toast(e&&e.error==="not-allowed"?"Permite el micrófono para practicar":"No te escuché. Usa el micrófono del teclado.");rerenderRec()};
+      pron.heard="";pron.res=null;pron.listening=true;pronSR.start();rerenderRec()}
+    catch(e){pron.listening=false;toast("Usa el micrófono del teclado");rerenderRec()}};
+}
+
 function renderHoy(){
   const el=document.getElementById("v-hoy");
   const d=addDays(START_D,viewIdx), k=key(d), s=Math.floor(viewIdx/7)+1, wd=viewIdx%7, w=SEMANAS[s-1];
@@ -578,7 +829,7 @@ function renderHoy(){
       </div>
       <div class="topics">
         <a class="topic" href="#quiz" data-open="q" style="--tc:var(--c-gram);--tc-soft:var(--c-gram-soft);color:inherit;text-decoration:none"><span class="eyebrow">Gramática</span><b>${esc(w[0])} <span style="color:var(--c-gram)">· practicar ↓</span></b></a>
-        <div class="topic" style="--tc:var(--c-speak);--tc-soft:var(--c-speak-soft)"><span class="eyebrow">Hablar</span><b>${esc(w[1])}</b></div>
+        <a class="topic" href="#grab" data-open="r" style="--tc:var(--c-speak);--tc-soft:var(--c-speak-soft);color:inherit;text-decoration:none"><span class="eyebrow">Hablar</span><b>${esc(w[1])} <span style="color:var(--c-speak)">· grabarme ↓</span></b></a>
         <a class="topic" href="#vocab" data-open="v" style="--tc:var(--c-vocab);--tc-soft:var(--c-vocab-soft);color:inherit;text-decoration:none"><span class="eyebrow">Vocabulario</span><b>${esc(w[2])} <span style="color:var(--c-vocab)">· ver lista ↓</span></b></a>
       </div>
       <ul class="tasks">${ts.map(t=>{const id=k+":"+t.id, on=!!state.checks[id];return `<li>
@@ -586,19 +837,21 @@ function renderHoy(){
           <span class="box">${check}</span>
           <span><span class="t">${esc(t.t)}</span>${t.main?'<span class="tag">Principal</span>':""}<span class="dd">${esc(t.d)}</span></span>
           <span class="m">${t.m} min</span>
-        </button></li>`}).join("")}</ul>
+        </button>${taskLinks(t,s)}</li>`}).join("")}</ul>
       <p class="note">En días pesados, haz al menos Anki y 10 minutos de listening: así no rompes la racha.</p>
     </section>
     ${practicaCard(s)}
+    ${recCard(s)}
+    ${pronCard(s)}
     ${vocabCard(s)}</div>`;
-  bindQuiz(el,s);bindVocab(el,s);
-  el.querySelectorAll("[data-fold]").forEach(b=>b.onclick=()=>{const k=b.dataset.fold;if(k==="q")openQ=!openQ;else openV=!openV;
+  bindQuiz(el,s);bindVocab(el,s);bindRec(el,s);bindPron(el,s);
+  el.querySelectorAll("[data-fold]").forEach(b=>b.onclick=()=>{const k=b.dataset.fold;setOpen(k,!isOpen(k));
     const sec=b.closest("section"), top=sec.getBoundingClientRect().top;renderHoy();
-    const n=document.getElementById(k==="q"?"quiz":"vocab");if(n){const d=n.getBoundingClientRect().top-top;if(d)window.scrollBy(0,d)}});
-  el.querySelectorAll("a[data-open]").forEach(a=>a.onclick=e=>{e.preventDefault();const k=a.dataset.open;if(k==="q")openQ=true;else openV=true;
-    renderHoy();document.getElementById(k==="q"?"quiz":"vocab").scrollIntoView({behavior:"smooth",block:"start"})});
-  el.querySelector("#prev").onclick=()=>{viewIdx=clampIdx(viewIdx-1);vocabWeek=null;openQ=openV=false;renderHoy()};
-  el.querySelector("#next").onclick=()=>{viewIdx=clampIdx(viewIdx+1);vocabWeek=null;openQ=openV=false;renderHoy()};
+    const n=document.getElementById(FOLDID[k]);if(n){const d=n.getBoundingClientRect().top-top;if(d)window.scrollBy(0,d)}});
+  el.querySelectorAll("a[data-open]").forEach(a=>a.onclick=e=>{e.preventDefault();const k=a.dataset.open;setOpen(k,true);
+    renderHoy();document.getElementById(FOLDID[k]).scrollIntoView({behavior:"smooth",block:"start"})});
+  el.querySelector("#prev").onclick=()=>{viewIdx=clampIdx(viewIdx-1);vocabWeek=null;openQ=openV=openR=openP=false;pron.i=0;pron.res=null;renderHoy()};
+  el.querySelector("#next").onclick=()=>{viewIdx=clampIdx(viewIdx+1);vocabWeek=null;openQ=openV=openR=openP=false;pron.i=0;pron.res=null;renderHoy()};
   const hb=el.querySelector("#hoyb"); if(hb) hb.onclick=()=>{viewIdx=clampIdx(dayIndex(today()));renderHoy()};
   el.querySelectorAll("button[data-k]").forEach(cb=>cb.onclick=()=>{
     const before=racha().n, wasFull=prog(viewIdx).done===prog(viewIdx).total, k=cb.dataset.k;
@@ -722,7 +975,7 @@ function renderAvance(){
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json()],{type:"application/json"}));
     a.download="ruta-ingles-respaldo-"+key(today())+".json";document.body.appendChild(a);a.click();a.remove()};
   const importar=txt=>{try{const d=JSON.parse(txt);if(!d||typeof d!=="object"||!d.checks) throw 0;
-      state={checks:Object.assign({},state.checks,d.checks),hitos:Object.assign({},state.hitos,d.hitos||{}),scores:[...state.scores],errores:mergeErr(state.errores,d.errores||[]),vocab:Object.assign({},state.vocab,d.vocab||{})};
+      state={checks:Object.assign({},state.checks,d.checks),hitos:Object.assign({},state.hitos,d.hitos||{}),scores:[...state.scores],errores:mergeErr(state.errores,d.errores||[]),vocab:Object.assign({},state.vocab,d.vocab||{}),pron:Object.assign({},state.pron,d.pron||{})};
       (d.scores||[]).forEach(s=>{if(!state.scores.some(x=>x.f===s.f&&x.p===s.p))state.scores.push(s)});
       persist();renderAll();toast("Respaldo importado")}catch(e){toast("Ese texto no es un respaldo válido de esta app")}};
   el.querySelector("#impb").onclick=()=>{const v=el.querySelector("#impt").value.trim();if(v) importar(v)};
@@ -849,7 +1102,7 @@ if(IN_VIEWER)(async()=>{
   ref.onSnapshot(snap=>{
     if(!snap.metadata.fromCache) clearTimeout(timer);
     mode="db";
-    if(snap.exists){const d=snap.data(), remote={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{}};
+    if(snap.exists){const d=snap.data(), remote={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{}};
       // la copia en la nube manda; se ignoran copias viejas y lo que llega justo después de tocar algo
       if(snap.metadata.fromCache||snap.metadata.hasPendingWrites) return;
       if(pending>0||Date.now()-lastEdit<2500){if(primera){primera=false;if(pending===0)persist()}return;}
