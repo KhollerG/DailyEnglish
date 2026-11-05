@@ -280,6 +280,22 @@ audio{width:100%}
 .er .ex{font-size:14px;color:var(--muted);font-style:italic}
 .er .say{border:0;background:transparent;color:var(--ec);font-size:16px;cursor:pointer;padding:0 4px;align-self:end}
 select.topicsel{font:600 14px var(--body);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink);width:100%}
+/* perfil */
+.toph{display:flex;align-items:center;gap:10px;min-width:0}
+.avbtn{border:0;padding:0;background:transparent;cursor:pointer;border-radius:50%;flex:none;touch-action:manipulation}
+.av{border-radius:50%;display:grid;place-items:center;overflow:hidden;color:#fff;font:800 var(--avf,16px) var(--display);background:var(--avc,var(--accent));flex:none}
+.av img{width:100%;height:100%;object-fit:cover}
+.av svg{width:58%;height:58%}
+.avbig{display:flex;flex-direction:column;align-items:center;gap:10px}
+.emojis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.emo{font-size:24px;aspect-ratio:1;border-radius:14px;border:2px solid var(--line);background:var(--surface2);cursor:pointer;display:grid;place-items:center;touch-action:manipulation}
+.emo[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.colors{display:flex;gap:10px;flex-wrap:wrap}
+.col{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.col[aria-pressed="true"]{border-color:var(--ink)}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.field input[type=text],.field select{font:600 16px var(--body);padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);color:var(--ink)}
+.count{font:800 34px var(--display);color:var(--accent)}
 /* práctica */
 .q{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--surface2)}
 .q .s{font-weight:600}
@@ -332,13 +348,14 @@ a.link{color:var(--c-gram);font-weight:600}
   <symbol id="i-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></g></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3" fill="currentColor"/></symbol>
   <symbol id="i-spk" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></g></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6Z"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5 9 4l6 2.5L20 4v13.5L15 20l-6-2.5L4 20Z"/><path d="M9 4v13.5M15 6.5V20"/></g></symbol>
 </svg>
 
 <div class="wrap">
   <div class="top">
-    <div><h1>DailyEnglish</h1><div class="sub" id="sub"></div></div>
+    <div class="toph"><button type="button" class="avbtn" id="avbtn" aria-label="Mi perfil"><span id="avatar"></span></button><div style="min-width:0"><h1 id="hello">DailyEnglish</h1><div class="sub" id="sub"></div></div></div>
     <div class="topr">
       <button type="button" class="themebtn" id="themebtn" aria-label="Cambiar tema"><svg><use href="#i-auto"/></svg></button>
       <span class="pill" id="pill"><svg><use href="#i-flame"/></svg><span id="pilln">0</span></span>
@@ -349,6 +366,7 @@ a.link{color:var(--c-gram);font-weight:600}
   <main id="v-avance" hidden></main>
   <main id="v-errores" hidden></main>
   <main id="v-plan" hidden></main>
+  <main id="v-perfil" hidden></main>
   <div class="sync" id="status"></div>
 </div>
 
@@ -466,11 +484,11 @@ function tareas(idx){
 }
 
 // ---------- estado ----------
-let state={checks:{},hitos:{},scores:[],errores:[],vocab:{},pron:{},gram:{},vq:{}};
+let state={checks:{},hitos:{},scores:[],errores:[],vocab:{},pron:{},gram:{},vq:{},perfil:{}};
 let ref=null, mode="local", writing=Promise.resolve(), canWrite=true;
 const LS="ruta-ingles-v1";
 const IN_VIEWER=!!(window.claude&&window.claude.use);
-function loadLocal(){try{const s=localStorage.getItem(LS);if(s){const d=JSON.parse(s);state={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{}}}}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem(LS);if(s){const d=JSON.parse(s);state={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{},perfil:d.perfil||{}}}}catch(e){}}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 function setStatus(t,warn){const el=document.getElementById("status");el.textContent=t;el.classList.toggle("warn",!!warn)}
 let pending=0, lastEdit=0;
@@ -539,8 +557,20 @@ function renderTop(){
   const pill=document.getElementById("pill");
   pill.classList.toggle("off",!r.hoy);
   pill.setAttribute("aria-label",`Racha de ${r.n} días`);
-  document.getElementById("sub").textContent=t<0?"Empieza el lunes 2 de noviembre":t>=TOTAL_DAYS?"Plan terminado":`Semana ${s} de ${TOTAL_WEEKS} · Fase ${faseDe(s).n}`;
+  const pf=state.perfil||{}, nom=(pf.nombre||"").trim().split(/\s+/)[0], dx=diasExamen();
+  document.getElementById("hello").textContent=nom?"Hola, "+nom:APPNAME;
+  document.getElementById("avatar").innerHTML=avatarHTML(40);
+  document.getElementById("sub").textContent=(t<0?"Empieza el lunes 2 de noviembre":t>=TOTAL_DAYS?"Plan terminado":`Semana ${s} de ${TOTAL_WEEKS} · Fase ${faseDe(s).n}`)+(dx!=null&&dx>=0?` · ${dx===0?"¡Examen hoy!":"faltan "+dx+" días"}`:"");
 }
+const APPNAME=document.getElementById("hello").textContent;
+const AVCOL=["#1f6feb","#0a8f9e","#e98a00","#d6336c","#7a4fd6","#178a47"];
+const EMOJIS=["🧑‍💻","📡","🎧","🚀","🦉","🐯","🎓","🔥","⚡","🌎","🦅","🏔️"];
+function iniciales(n){const p=(n||"").trim().split(/\s+/).filter(Boolean);return p.length?(p[0][0]+(p[1]?p[1][0]:"")).toUpperCase():""}
+function avatarHTML(px){const pf=state.perfil||{},c=pf.color||AVCOL[0],st=`width:${px}px;height:${px}px;--avc:${c};--avf:${Math.round(px*.42)}px`;
+  if(pf.tipo==="foto"&&pf.foto) return `<span class="av" style="${st}"><img src="${pf.foto}" alt=""></span>`;
+  if(pf.tipo==="emoji"&&pf.emoji) return `<span class="av" style="${st};font-size:${Math.round(px*.55)}px">${pf.emoji}</span>`;
+  const ini=iniciales(pf.nombre); return `<span class="av" style="${st}">${ini?esc(ini):'<svg><use href="#i-user"/></svg>'}</span>`}
+function diasExamen(){const f=(state.perfil||{}).fecha;if(!f)return null;const [y,m,d]=f.split("-").map(Number);return Math.round((mk(y,m-1,d)-today())/864e5)}
 
 function streakCard(){
   const r=racha(), best=mejorRacha(), t=dayIndex(today());
@@ -893,10 +923,19 @@ function tipPara(w){
 let vozEN=null;
 function elegirVoz(){try{const vs=speechSynthesis.getVoices()||[];vozEN=vs.find(v=>/^en[-_]US/i.test(v.lang)&&v.localService&&/Samantha|Alex|Ava|Allison|Nicky|Aaron/i.test(v.name))||vs.find(v=>/^en[-_]US/i.test(v.lang)&&v.localService)||vs.find(v=>/^en[-_](US|GB)/i.test(v.lang))||null}catch(e){}}
 try{if(window.speechSynthesis){elegirVoz();speechSynthesis.onvoiceschanged=elegirVoz}}catch(e){}
+// Intento de sonar aunque el iPhone esté en silencio: pedir sesión de audio "playback" (iOS 17+)
+// y reproducir un audio mudo para que el sistema trate la app como reproductor.
+let mudoEl=null;
+function activarAudio(){
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+  try{if(!mudoEl){mudoEl=new Audio("data:audio/wav;base64,UklGRqQMAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YYAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==");mudoEl.loop=true;mudoEl.setAttribute("playsinline","");mudoEl.volume=0.01}const pr=mudoEl.play();if(pr&&pr.catch)pr.catch(()=>{})}catch(e){}
+}
+function soltarAudio(){try{mudoEl&&mudoEl.pause()}catch(e){}}
 function hablar(txt,rate){
   if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){toast("Este navegador no puede leer en voz alta");return}
+  activarAudio();
   const decir=()=>{try{const u=new SpeechSynthesisUtterance(txt);u.lang="en-US";u.rate=rate||.9;u.volume=1;if(!vozEN)elegirVoz();if(vozEN)u.voice=vozEN;
-    let empezo=false;u.onstart=()=>{empezo=true};
+    let empezo=false;u.onstart=()=>{empezo=true};u.onend=()=>setTimeout(()=>{if(!speechSynthesis.speaking)soltarAudio()},400);
     u.onerror=e=>{if(e&&e.error!=="interrupted"&&e.error!=="canceled")toast("No se pudo reproducir. Quita el modo silencio y sube el volumen.")};
     speechSynthesis.resume();speechSynthesis.speak(u);
     setTimeout(()=>{if(!empezo&&!speechSynthesis.speaking)toast("¿No suena? Quita el modo silencio del iPhone y sube el volumen.")},1800)}catch(e){toast("No se pudo reproducir el audio")}};
@@ -912,7 +951,7 @@ function pronCard(s){
     <div class="dayhead"><span class="note">Frase ${i+1} de ${L.length}${best!=null?" · tu mejor: "+best+"%":""}</span>
       <div class="arrows"><button class="iconbtn" id="pprev" aria-label="Frase anterior" ${i===0?"disabled":""}>‹</button><button class="iconbtn" id="pnext" aria-label="Frase siguiente" ${i>=L.length-1?"disabled":""}>›</button></div></div>
     <div class="target">${esc(target)}</div>
-    <div class="prow"><button class="btn ghost" id="plisten" type="button">🔊 Escuchar</button><button class="btn ghost" id="pslow" type="button">Lento</button></div><p class="note" style="margin-top:-6px">¿No suena? Desactiva el modo silencio del iPhone (botón lateral) y sube el volumen.</p>
+    <div class="prow"><button class="btn ghost" id="plisten" type="button">🔊 Escuchar</button><button class="btn ghost" id="pslow" type="button">Lento</button></div><p class="note" style="margin-top:-6px">Si no suena con el iPhone en silencio, desactiva el modo silencio (botón lateral) y sube el volumen.</p>
     <div class="prow">${SR?`<button class="micbig${pron.listening?" on":""}" id="pmic" type="button" aria-label="${pron.listening?"Detener":"Decir la frase"}"><svg><use href="#${pron.listening?"i-stop":"i-mic"}"/></svg></button><span class="note">${pron.listening?"Escuchando… di la frase":"Toca y di la frase"}</span>`:`<span class="note">Toca el recuadro, luego el <b>micrófono del teclado</b>, y di la frase.</span>`}</div>
     <textarea id="pheard" style="min-height:64px;font:500 14.5px var(--body)" placeholder="Aquí aparece lo que el celular entendió">${esc(pron.heard)}</textarea>
     <div><button class="btn" id="pcheck" type="button">Comparar</button></div>
@@ -1124,7 +1163,7 @@ function renderAvance(){
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json()],{type:"application/json"}));
     a.download="ruta-ingles-respaldo-"+key(today())+".json";document.body.appendChild(a);a.click();a.remove()};
   const importar=txt=>{try{const d=JSON.parse(txt);if(!d||typeof d!=="object"||!d.checks) throw 0;
-      state={checks:Object.assign({},state.checks,d.checks),hitos:Object.assign({},state.hitos,d.hitos||{}),scores:[...state.scores],errores:mergeErr(state.errores,d.errores||[]),vocab:Object.assign({},state.vocab,d.vocab||{}),pron:Object.assign({},state.pron,d.pron||{}),gram:Object.assign({},state.gram,d.gram||{}),vq:Object.assign({},state.vq,d.vq||{})};
+      state={checks:Object.assign({},state.checks,d.checks),hitos:Object.assign({},state.hitos,d.hitos||{}),scores:[...state.scores],errores:mergeErr(state.errores,d.errores||[]),vocab:Object.assign({},state.vocab,d.vocab||{}),pron:Object.assign({},state.pron,d.pron||{}),gram:Object.assign({},state.gram,d.gram||{}),vq:Object.assign({},state.vq,d.vq||{}),perfil:Object.assign({},state.perfil,d.perfil||{})};
       (d.scores||[]).forEach(s=>{if(!state.scores.some(x=>x.f===s.f&&x.p===s.p))state.scores.push(s)});
       persist();renderAll();toast("Respaldo importado")}catch(e){toast("Ese texto no es un respaldo válido de esta app")}};
   el.querySelector("#impb").onclick=()=>{const v=el.querySelector("#impt").value.trim();if(v) importar(v)};
@@ -1228,11 +1267,49 @@ function renderPlan(){
   bindHitos(el);
 }
 
-function renderAll(){renderTop();renderHoy();renderSemana();renderAvance();renderErrores();renderPlan()}
+let prevView="hoy";
+function renderPerfil(){
+  const el=document.getElementById("v-perfil"), pf=state.perfil||{}, dx=diasExamen();
+  el.innerHTML=`<div class="wrap" style="gap:14px">
+  <div><button class="iconbtn txt" id="pfback" type="button">‹ Volver</button></div>
+  <section class="card"><h2>Mi perfil</h2>
+    <div class="avbig">${avatarHTML(104)}
+      <div class="btnrow" style="justify-content:center"><label class="btn" for="pffoto" style="display:inline-flex;align-items:center;cursor:pointer">Subir foto</label>${pf.tipo==="foto"?'<button class="btn ghost" id="pfquitar" type="button">Quitar foto</button>':""}</div>
+      <input type="file" id="pffoto" accept="image/*" hidden>
+    </div>
+    <label class="field" for="pfnombre">Tu nombre<input type="text" id="pfnombre" maxlength="40" value="${esc(pf.nombre||"")}" placeholder="Escribe tu nombre" autocomplete="name"></label>
+  </section>
+  <section class="card"><h3>O elige un avatar</h3>
+    <div class="emojis">${EMOJIS.map(e=>`<button class="emo" type="button" data-emo="${e}" aria-pressed="${pf.tipo==="emoji"&&pf.emoji===e}">${e}</button>`).join("")}</div>
+    <button class="btn ghost" id="pfini" type="button" aria-pressed="${!pf.tipo||pf.tipo==="inicial"}">Usar mis iniciales${iniciales(pf.nombre)?" ("+esc(iniciales(pf.nombre))+")":""}</button>
+    <div><span class="note">Color de fondo</span><div class="colors" style="margin-top:6px">${AVCOL.map(c=>`<button class="col" type="button" data-col="${c}" style="background:${c}" aria-label="Color ${c}" aria-pressed="${(pf.color||AVCOL[0])===c}"></button>`).join("")}</div></div>
+  </section>
+  <section class="card"><h3>Mi meta</h3>
+    <label class="field" for="pfexam">Examen<select id="pfexam">${["","Cambridge B2 First","Cambridge C1 Advanced","IELTS","TOEFL iBT","Otro"].map(o=>`<option value="${o}" ${(pf.examen||"")===o?"selected":""}>${o||"Aún no decido"}</option>`).join("")}</select></label>
+    <label class="field" for="pffecha">Fecha del examen<input type="date" id="pffecha" value="${esc(pf.fecha||"")}"></label>
+    ${dx!=null?`<div class="fbi" style="align-items:center;text-align:center"><span class="count num">${dx<0?"✓":dx}</span><span class="note">${dx<0?"La fecha ya pasó":dx===0?"¡Tu examen es hoy!":"días para tu "+esc(pf.examen||"examen")}</span></div>`:'<p class="note">Pon la fecha y verás la cuenta regresiva arriba, junto a la semana.</p>'}
+  </section>
+  <p class="note" style="text-align:center">Tu perfil se guarda en este dispositivo${IN_VIEWER?" y en tu cuenta":""} y va incluido en el respaldo.</p></div>`;
+  const set=(o)=>{state.perfil=Object.assign({},state.perfil,o);persist();renderTop();renderPerfil()};
+  el.querySelector("#pfback").onclick=()=>show(prevView);
+  const nm=el.querySelector("#pfnombre"); nm.onchange=()=>set({nombre:nm.value.trim()}); nm.oninput=()=>{state.perfil=Object.assign({},state.perfil,{nombre:nm.value});renderTop()};
+  el.querySelectorAll("[data-emo]").forEach(b=>b.onclick=()=>set({tipo:"emoji",emoji:b.dataset.emo}));
+  el.querySelector("#pfini").onclick=()=>set({tipo:"inicial"});
+  el.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>set({color:b.dataset.col}));
+  el.querySelector("#pfexam").onchange=e=>set({examen:e.target.value});
+  el.querySelector("#pffecha").onchange=e=>set({fecha:e.target.value});
+  const q=el.querySelector("#pfquitar"); if(q) q.onclick=()=>set({tipo:"inicial",foto:""});
+  el.querySelector("#pffoto").onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
+    const rd=new FileReader();rd.onload=()=>{const img=new Image();img.onload=()=>{const S=180,c=document.createElement("canvas");c.width=c.height=S;const k=Math.min(img.width,img.height);
+      c.getContext("2d").drawImage(img,(img.width-k)/2,(img.height-k)/2,k,k,0,0,S,S);set({tipo:"foto",foto:c.toDataURL("image/jpeg",.82)});toast("Foto actualizada")};
+      img.onerror=()=>toast("No pude abrir esa imagen");img.src=rd.result};rd.readAsDataURL(f)};
+}
+function renderAll(){renderTop();renderPerfil();renderHoy();renderSemana();renderAvance();renderErrores();renderPlan()}
 function show(v){document.querySelectorAll(".tabbar button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
-  ["hoy","semana","avance","errores","plan"].forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
+  ["hoy","semana","avance","errores","plan","perfil"].forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
   window.scrollTo(0,0);try{localStorage.setItem(LS+"-tab",v)}catch(e){}}
 document.querySelectorAll(".tabbar button").forEach(b=>b.onclick=()=>show(b.dataset.view));
+document.getElementById("avbtn").onclick=()=>{const cur=["hoy","semana","avance","errores","plan"].find(x=>!document.getElementById("v-"+x).hidden);if(cur)prevView=cur;show("perfil")};
 
 loadLocal(); renderAll();
 try{const t=localStorage.getItem(LS+"-tab");if(t)show(t)}catch(e){}
@@ -1251,7 +1328,7 @@ if(IN_VIEWER)(async()=>{
   ref.onSnapshot(snap=>{
     if(!snap.metadata.fromCache) clearTimeout(timer);
     mode="db";
-    if(snap.exists){const d=snap.data(), remote={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{}};
+    if(snap.exists){const d=snap.data(), remote={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{},perfil:d.perfil||{}};
       // la copia en la nube manda; se ignoran copias viejas y lo que llega justo después de tocar algo
       if(snap.metadata.fromCache||snap.metadata.hasPendingWrites) return;
       if(pending>0||Date.now()-lastEdit<2500){if(primera){primera=false;if(pending===0)persist()}return;}
