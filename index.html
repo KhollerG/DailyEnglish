@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a9584">
+<meta name="theme-color" content="#1f6feb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -25,7 +25,7 @@
   --c-gram:#4b4fe6; --c-gram-soft:#d7d9ff; --c-speak:#e02d68; --c-speak-soft:#ffd3e1;
   --c-vocab:#c27a00; --c-vocab-soft:#ffe7a8; --c-listen:#1a72e8; --c-listen-soft:#cfe3ff;
   --c-shadow:#7d32ea; --c-shadow-soft:#e5d5ff; --hero:linear-gradient(135deg,#ffddc6 0%,#ffcfe0 50%,#ddd2ff 100%);
-  --band:linear-gradient(135deg,#c4f0e7 0%,#d2e2ff 100%);
+  --band:linear-gradient(135deg,#c4f0e7 0%,#d2e2ff 100%); --bad:var(--c-speak); --bad-soft:var(--c-speak-soft);
   --display:"Bricolage Grotesque",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
   --body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
@@ -44,6 +44,29 @@
   --c-vocab:#ffc23d; --c-vocab-soft:#4a360a; --c-listen:#5aa9ff; --c-listen-soft:#143661;
   --c-shadow:#b98aff; --c-shadow-soft:#3a1f63; --hero:linear-gradient(135deg,#4a2410 0%,#4d1830 50%,#2e1f5c 100%);
   --band:linear-gradient(135deg,#0f4440 0%,#1a2f63 100%); color-scheme:dark}
+/* Paleta Enfoque: base azul fría y alto contraste para concentrarse; ámbar solo para lo que pide acción (racha, tarea principal) */
+:root[data-palette="focus"]{
+  --bg:#edf3fb; --surface:#ffffff; --surface2:#f2f7fd; --ink:#0b1a2e; --muted:#4a5b74; --line:#d0dcea;
+  --accent:#1f6feb; --accent-ink:#ffffff; --accent-soft:#dbe8fd;
+  --flame:#e98a00; --flame-soft:#ffefd2; --good:#178a47; --good-soft:#d4f1df; --bad:#d6336c; --bad-soft:#fde0ea;
+  --c-gram:#1f6feb; --c-gram-soft:#dbe8fd; --c-speak:#0a8f9e; --c-speak-soft:#d2f1f4;
+  --c-vocab:#bf7400; --c-vocab-soft:#ffeccb; --c-listen:#2f5bd3; --c-listen-soft:#dfe6fb;
+  --c-shadow:#4b5fd6; --c-shadow-soft:#e2e6fb; --hero:linear-gradient(135deg,#d8e7ff 0%,#e3f3ff 60%,#fff1d6 100%);
+  --band:linear-gradient(135deg,#dbe8fd 0%,#dcf2f5 100%)}
+@media (prefers-color-scheme: dark){:root[data-palette="focus"]:not([data-theme="light"]){
+  --bg:#0a1321; --surface:#111f32; --surface2:#16283e; --ink:#eaf2fb; --muted:#9cb0c9; --line:#253f5d;
+  --accent:#5aa2ff; --accent-ink:#04182f; --accent-soft:#143156; --flame:#ffb020; --flame-soft:#3d2a08; --good:#4fd18a; --good-soft:#0f3a25; --bad:#ff6b8f; --bad-soft:#4a1626;
+  --c-gram:#5aa2ff; --c-gram-soft:#143156; --c-speak:#38c7d3; --c-speak-soft:#0f3a40; --c-vocab:#ffc14d; --c-vocab-soft:#3d2e0c;
+  --c-listen:#7aa8ff; --c-listen-soft:#1a2f5a; --c-shadow:#9aa8ff; --c-shadow-soft:#23285a;
+  --hero:linear-gradient(135deg,#13294a 0%,#0f3340 60%,#3a2a0c 100%); --band:linear-gradient(135deg,#143156 0%,#0f3a40 100%)}}
+:root[data-palette="focus"][data-theme="dark"]{
+  --bg:#0a1321; --surface:#111f32; --surface2:#16283e; --ink:#eaf2fb; --muted:#9cb0c9; --line:#253f5d;
+  --accent:#5aa2ff; --accent-ink:#04182f; --accent-soft:#143156; --flame:#ffb020; --flame-soft:#3d2a08; --good:#4fd18a; --good-soft:#0f3a25; --bad:#ff6b8f; --bad-soft:#4a1626;
+  --c-gram:#5aa2ff; --c-gram-soft:#143156; --c-speak:#38c7d3; --c-speak-soft:#0f3a40; --c-vocab:#ffc14d; --c-vocab-soft:#3d2e0c;
+  --c-listen:#7aa8ff; --c-listen-soft:#1a2f5a; --c-shadow:#9aa8ff; --c-shadow-soft:#23285a;
+  --hero:linear-gradient(135deg,#13294a 0%,#0f3340 60%,#3a2a0c 100%); --band:linear-gradient(135deg,#143156 0%,#0f3a40 100%)}
+.focustip{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--flame-soft);color:var(--ink);font-size:14px}
+.focustip b{color:var(--flame)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;margin:0;
@@ -231,7 +254,7 @@ a.rlink.wk{background:var(--c);color:var(--surface)}
 audio{width:100%}
 .fb{display:flex;flex-direction:column;gap:8px}
 .fbi{border-radius:14px;padding:10px 12px;background:var(--surface2);display:flex;flex-direction:column;gap:4px}
-.fbi .bad{color:var(--c-speak);text-decoration:line-through}
+.fbi .bad{color:var(--bad);text-decoration:line-through}
 .fbi .good{font-weight:700;color:var(--good)}
 .fbi .why{font-size:13.5px;color:var(--muted)}
 .lvl{display:inline-block;font:800 15px var(--display);padding:3px 12px;border-radius:999px;background:var(--c-gram-soft);color:var(--c-gram)}
@@ -242,7 +265,7 @@ audio{width:100%}
 .words{display:flex;flex-wrap:wrap;gap:6px}
 .wd2{font:600 15px var(--body);padding:4px 10px;border-radius:10px;border:0;cursor:pointer;touch-action:manipulation}
 .wd2.ok{background:var(--good-soft);color:var(--good)}
-.wd2.bad{background:var(--c-speak-soft);color:var(--c-speak);text-decoration:underline;text-decoration-style:wavy}
+.wd2.bad{background:var(--bad-soft);color:var(--bad);text-decoration:underline;text-decoration-style:wavy}
 .pscore{font:800 30px var(--display)}
 .tip{border-radius:12px;padding:10px 12px;background:var(--surface2);font-size:14px;display:flex;flex-direction:column;gap:4px}
 .micbig{width:64px;height:64px;border-radius:50%;border:0;background:var(--c-shadow);color:#fff;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
@@ -254,7 +277,7 @@ audio{width:100%}
 .opts{display:flex;gap:8px;flex-wrap:wrap}
 .opt{font:600 14px var(--body);padding:8px 14px;border-radius:999px;border:2px solid var(--c-gram);background:var(--surface);color:var(--c-gram);cursor:pointer}
 .opt.right{background:var(--good);border-color:var(--good);color:var(--surface)}
-.opt.wrong{background:var(--c-speak);border-color:var(--c-speak);color:var(--surface)}
+.opt.wrong{background:var(--bad);border-color:var(--bad);color:var(--surface)}
 .opt:disabled{cursor:default}
 .why{font-size:13.5px;color:var(--muted)}
 .score{font:800 22px var(--display);color:var(--c-gram)}
@@ -480,9 +503,15 @@ function aplicarTema(){
   if(tema==="auto"){ if(hostTheme) root.setAttribute("data-theme",hostTheme); else root.removeAttribute("data-theme"); }
   else root.setAttribute("data-theme",tema);
   const dark=tema==="dark"||(tema==="auto"&&(hostTheme==="dark"||(!hostTheme&&matchMedia("(prefers-color-scheme: dark)").matches)));
-  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",dark?"#151f2e":"#0a9584");
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",paleta==="focus"?(dark?"#111f32":"#1f6feb"):(dark?"#151f2e":"#0a9584"));
   const b=document.getElementById("themebtn"); if(b){const t=TEMAS.find(x=>x[0]===tema);b.querySelector("use").setAttribute("href","#"+t[2]);b.setAttribute("aria-label","Tema: "+t[1]+". Toca para cambiar")}
 }
+const PKEY="ruta-ingles-paleta";
+const PALETAS=[["focus","Enfoque","Azul y alto contraste para concentrarte"],["vivid","Colorida","Un color distinto por cada tipo de tarea"]];
+let paleta="focus"; try{paleta=localStorage.getItem(PKEY)||"focus"}catch(e){}
+function aplicarPaleta(){document.documentElement.setAttribute("data-palette",paleta)}
+aplicarPaleta();
+function setPaleta(v){paleta=v;try{localStorage.setItem(PKEY,v)}catch(e){}aplicarPaleta();aplicarTema();renderAvance()}
 function setTema(t){tema=t;try{localStorage.setItem(TKEY,t)}catch(e){}aplicarTema();renderAvance()}
 aplicarTema();
 try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",aplicarTema)}catch(e){}
@@ -872,7 +901,9 @@ function renderHoy(){
   const d=addDays(START_D,viewIdx), k=key(d), s=Math.floor(viewIdx/7)+1, wd=viewIdx%7, w=SEMANAS[s-1];
   const ts=tareas(viewIdx), p=prog(viewIdx), mins=ts.reduce((a,t)=>a+t.m,0), realIdx=dayIndex(today());
   const C=2*Math.PI*25, off=C*(1-(p.total?p.done/p.total:0));
+  const hora=new Date().getHours(), tarde=(hora>=22||hora<5)&&viewIdx===clampIdx(dayIndex(today()));
   el.innerHTML=`<div class="wrap" style="gap:14px">
+    ${tarde?`<div class="focustip"><span>🌙</span><span><b>Es tarde.</b> Para no dormirte: estudia sentado y con luz, empieza por lo que es en voz alta (speaking, pronunciación) y haz bloques cortos de 15 minutos. Si se te cierran los ojos, deja la tarea mínima y duerme: lo que aprendes se fija mientras duermes.</span></div>`:""}
     ${streakCard()}
     <section class="card dayc">
       <div class="dayhead dayband">
@@ -1009,6 +1040,7 @@ function renderAvance(){
   <section class="card"><h3>Apariencia</h3>
     <div class="themeopts">${TEMAS.map(t=>`<button type="button" class="themeopt" data-tema="${t[0]}" aria-pressed="${tema===t[0]}"><svg><use href="#${t[2]}"/></svg>${t[1]}</button>`).join("")}</div>
     <p class="note">Automático sigue el modo claro u oscuro de tu celular.</p>
+    <div class="themeopts" style="grid-template-columns:repeat(2,1fr)">${PALETAS.map(p=>`<button type="button" class="themeopt" data-paleta="${p[0]}" aria-pressed="${paleta===p[0]}"><span style="display:flex;gap:4px">${(p[0]==="focus"?["#1f6feb","#0a8f9e","#e98a00"]:["#4b4fe6","#e02d68","#c27a00"]).map(c=>`<i style="width:14px;height:14px;border-radius:50%;background:${c}"></i>`).join("")}</span>${p[1]}<span class="note" style="font-weight:500;font-size:12px">${p[2]}</span></button>`).join("")}</div>
   </section>
   <section class="card"><h3>Respaldo</h3>
     <p class="note">Copia tu avance para pasarlo a otro dispositivo, o pega aquí un respaldo para recuperarlo.</p>
@@ -1021,6 +1053,7 @@ function renderAvance(){
       <label class="btn ghost" for="impf" style="display:inline-flex;align-items:center">Abrir archivo<input type="file" id="impf" accept=".json,application/json,text/plain" hidden></label></div>
   </section></div>`;
   el.querySelectorAll("[data-tema]").forEach(b=>b.onclick=()=>setTema(b.dataset.tema));
+  el.querySelectorAll("[data-paleta]").forEach(b=>b.onclick=()=>setPaleta(b.dataset.paleta));
   el.querySelector("#scoreform").onsubmit=e=>{e.preventDefault();
     const f=el.querySelector("#sf").value,p=+el.querySelector("#sp").value;
     if(!f||isNaN(p)||p<0||p>100) return;
