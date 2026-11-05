@@ -888,8 +888,20 @@ function tipPara(w){
   if(/^i[^aeiou]/.test(w)||/\bi[^aeiou]/.test(w))t.push("La «i» corta (it, is) es más relajada que la «i» española.");
   return t.length?t.slice(0,2):["Escúchala lento, sepárala en sílabas y repítela 3 veces."];
 }
-function hablar(txt,rate){try{if(!window.speechSynthesis){toast("Tu navegador no puede leer en voz alta");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang="en-US";u.rate=rate||.9;
-  const v=speechSynthesis.getVoices().find(v=>/en[-_]US/i.test(v.lang)&&/Samantha|Google|Natural|Premium|Enhanced/i.test(v.name))||speechSynthesis.getVoices().find(v=>/^en[-_]US/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+// Lectura en voz alta. En iPhone: cancel() justo antes de speak() a veces silencia la frase,
+// y el modo silencio puede apagar el sonido; por eso se espera un instante y se avisa si no empieza.
+let vozEN=null;
+function elegirVoz(){try{const vs=speechSynthesis.getVoices()||[];vozEN=vs.find(v=>/^en[-_]US/i.test(v.lang)&&v.localService&&/Samantha|Alex|Ava|Allison|Nicky|Aaron/i.test(v.name))||vs.find(v=>/^en[-_]US/i.test(v.lang)&&v.localService)||vs.find(v=>/^en[-_](US|GB)/i.test(v.lang))||null}catch(e){}}
+try{if(window.speechSynthesis){elegirVoz();speechSynthesis.onvoiceschanged=elegirVoz}}catch(e){}
+function hablar(txt,rate){
+  if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){toast("Este navegador no puede leer en voz alta");return}
+  const decir=()=>{try{const u=new SpeechSynthesisUtterance(txt);u.lang="en-US";u.rate=rate||.9;u.volume=1;if(!vozEN)elegirVoz();if(vozEN)u.voice=vozEN;
+    let empezo=false;u.onstart=()=>{empezo=true};
+    u.onerror=e=>{if(e&&e.error!=="interrupted"&&e.error!=="canceled")toast("No se pudo reproducir. Quita el modo silencio y sube el volumen.")};
+    speechSynthesis.resume();speechSynthesis.speak(u);
+    setTimeout(()=>{if(!empezo&&!speechSynthesis.speaking)toast("¿No suena? Quita el modo silencio del iPhone y sube el volumen.")},1800)}catch(e){toast("No se pudo reproducir el audio")}};
+  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(decir,250)}else decir();
+}
 const pronList=s=>(VOCAB[Math.min(s,22)]||[]).map(x=>x[2]);
 function pronCard(s){
   const L=pronList(s), sw=Math.min(s,22), done=L.filter((x,i)=>(state.pron[sw+":"+i]||0)>=90).length;
@@ -900,14 +912,14 @@ function pronCard(s){
     <div class="dayhead"><span class="note">Frase ${i+1} de ${L.length}${best!=null?" · tu mejor: "+best+"%":""}</span>
       <div class="arrows"><button class="iconbtn" id="pprev" aria-label="Frase anterior" ${i===0?"disabled":""}>‹</button><button class="iconbtn" id="pnext" aria-label="Frase siguiente" ${i>=L.length-1?"disabled":""}>›</button></div></div>
     <div class="target">${esc(target)}</div>
-    <div class="prow"><button class="btn ghost" id="plisten" type="button">🔊 Escuchar</button><button class="btn ghost" id="pslow" type="button">Lento</button></div>
+    <div class="prow"><button class="btn ghost" id="plisten" type="button">🔊 Escuchar</button><button class="btn ghost" id="pslow" type="button">Lento</button></div><p class="note" style="margin-top:-6px">¿No suena? Desactiva el modo silencio del iPhone (botón lateral) y sube el volumen.</p>
     <div class="prow">${SR?`<button class="micbig${pron.listening?" on":""}" id="pmic" type="button" aria-label="${pron.listening?"Detener":"Decir la frase"}"><svg><use href="#${pron.listening?"i-stop":"i-mic"}"/></svg></button><span class="note">${pron.listening?"Escuchando… di la frase":"Toca y di la frase"}</span>`:`<span class="note">Toca el recuadro, luego el <b>micrófono del teclado</b>, y di la frase.</span>`}</div>
     <textarea id="pheard" style="min-height:64px;font:500 14.5px var(--body)" placeholder="Aquí aparece lo que el celular entendió">${esc(pron.heard)}</textarea>
     <div><button class="btn" id="pcheck" type="button">Comparar</button></div>
     ${r?`<div class="fb">
       <div class="prow"><span class="pscore num" style="color:${r.score>=90?"var(--good)":r.score>=70?"var(--c-vocab)":"var(--c-speak)"}">${r.score}%</span><span class="note">${r.score>=90?"¡Se te entendió muy bien!":r.score>=70?"Bien. Repite las palabras en rojo.":"Varias palabras no se entendieron. Escucha y vuelve a intentar."}</span></div>
       <div class="words">${r.T.map((w,k)=>`<button type="button" class="wd2 ${r.ok[k]?"ok":"bad"}" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>
-      ${pron.sel?`<div class="tip"><b>${esc(pron.sel)}</b> <button class="sbtn" id="psay" type="button" style="align-self:flex-start">🔊 Escuchar palabra</button>${tipPara(pron.sel).map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:(r.ok.some(x=>!x)?'<p class="note">Toca una palabra en rojo para escucharla y ver un consejo.</p>':"")}
+      ${pron.sel?`<div class="tip"><b>${esc(pron.sel)}</b> <span class="prow"><button class="sbtn" id="psay" type="button">🔊 Escuchar palabra</button><a class="link" href="https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(pron.sel)}" target="_blank" rel="noopener">Pronunciación en Cambridge ↗</a></span>${tipPara(pron.sel).map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:(r.ok.some(x=>!x)?'<p class="note">Toca una palabra en rojo para escucharla y ver un consejo.</p>':"")}
     </div>`:""}
     <p class="note">Las palabras en rojo son las que el celular no reconoció: suele ser señal de que esa pronunciación no se entiende bien. No mide tu acento con detalle.</p>
   </section>`;
