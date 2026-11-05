@@ -299,6 +299,21 @@ select.topicsel{font:600 14px var(--body);padding:9px 10px;border:1px solid var(
 .field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
 .field input[type=text],.field select{font:600 16px var(--body);padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);color:var(--ink)}
 .count{font:800 34px var(--display);color:var(--accent)}
+/* diccionario */
+.dform{display:flex;gap:8px}
+.dform input{flex:1;min-width:0;font:600 16px var(--body);padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);color:var(--ink)}
+.dword{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dword h2{font-size:26px}
+.ipa{font:500 15px var(--mono);color:var(--muted)}
+.tr{font:700 18px var(--display);color:var(--accent)}
+.pos{font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--c-vocab)}
+.defs{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.defs .eg{color:var(--muted);font-style:italic;display:block}
+.chips2{display:flex;flex-wrap:wrap;gap:6px}
+.chip2{text-decoration:none;font:600 13px var(--body);padding:4px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--ink);cursor:pointer}
+.saved{display:flex;flex-direction:column;gap:6px}
+.savedi{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--surface2)}
+.savedi b{font-size:15px}.savedi span{font-size:13.5px;color:var(--muted)}
 /* práctica */
 .q{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--surface2)}
 .q .s{font-weight:600}
@@ -355,6 +370,7 @@ a.link{color:var(--c-gram);font-weight:600}
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3" fill="currentColor"/></symbol>
   <symbol id="i-spk" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4Z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></g></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="8.5" r="4"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6Z"/></g></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5 9 4l6 2.5L20 4v13.5L15 20l-6-2.5L4 20Z"/><path d="M9 4v13.5M15 6.5V20"/></g></symbol>
 </svg>
@@ -363,6 +379,7 @@ a.link{color:var(--c-gram);font-weight:600}
   <div class="top">
     <div class="toph"><button type="button" class="avbtn" id="avbtn" aria-label="Mi perfil"><span id="avatar"></span></button><div style="min-width:0"><h1 id="hello">DailyEnglish</h1><div class="sub" id="sub"></div></div></div>
     <div class="topr">
+      <button type="button" class="themebtn" id="dicbtn" aria-label="Diccionario"><svg><use href="#i-search"/></svg></button>
       <button type="button" class="themebtn" id="themebtn" aria-label="Cambiar tema"><svg><use href="#i-auto"/></svg></button>
       <span class="pill" id="pill"><svg><use href="#i-flame"/></svg><span id="pilln">0</span></span>
     </div>
@@ -373,6 +390,7 @@ a.link{color:var(--c-gram);font-weight:600}
   <main id="v-errores" hidden></main>
   <main id="v-plan" hidden></main>
   <main id="v-perfil" hidden></main>
+  <main id="v-dic" hidden></main>
   <div class="sync" id="status"></div>
 </div>
 
@@ -490,11 +508,11 @@ function tareas(idx){
 }
 
 // ---------- estado ----------
-let state={checks:{},hitos:{},scores:[],errores:[],vocab:{},pron:{},gram:{},vq:{},perfil:{}};
+let state={checks:{},hitos:{},scores:[],errores:[],vocab:{},pron:{},gram:{},vq:{},perfil:{},dicc:[]};
 let ref=null, mode="local", writing=Promise.resolve(), canWrite=true;
 const LS="ruta-ingles-v1";
 const IN_VIEWER=!!(window.claude&&window.claude.use);
-function loadLocal(){try{const s=localStorage.getItem(LS);if(s){const d=JSON.parse(s);state={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{},perfil:d.perfil||{}}}}catch(e){}}
+function loadLocal(){try{const s=localStorage.getItem(LS);if(s){const d=JSON.parse(s);state={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{},perfil:d.perfil||{},dicc:d.dicc||[]}}}catch(e){}}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 function setStatus(t,warn){const el=document.getElementById("status");el.textContent=t;el.classList.toggle("warn",!!warn)}
 let pending=0, lastEdit=0;
@@ -1171,7 +1189,7 @@ function renderAvance(){
     const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([json()],{type:"application/json"}));
     a.download="ruta-ingles-respaldo-"+key(today())+".json";document.body.appendChild(a);a.click();a.remove()};
   const importar=txt=>{try{const d=JSON.parse(txt);if(!d||typeof d!=="object"||!d.checks) throw 0;
-      state={checks:Object.assign({},state.checks,d.checks),hitos:Object.assign({},state.hitos,d.hitos||{}),scores:[...state.scores],errores:mergeErr(state.errores,d.errores||[]),vocab:Object.assign({},state.vocab,d.vocab||{}),pron:Object.assign({},state.pron,d.pron||{}),gram:Object.assign({},state.gram,d.gram||{}),vq:Object.assign({},state.vq,d.vq||{}),perfil:Object.assign({},state.perfil,d.perfil||{})};
+      state={checks:Object.assign({},state.checks,d.checks),hitos:Object.assign({},state.hitos,d.hitos||{}),scores:[...state.scores],errores:mergeErr(state.errores,d.errores||[]),vocab:Object.assign({},state.vocab,d.vocab||{}),pron:Object.assign({},state.pron,d.pron||{}),gram:Object.assign({},state.gram,d.gram||{}),vq:Object.assign({},state.vq,d.vq||{}),perfil:Object.assign({},state.perfil,d.perfil||{}),dicc:unirDicc(state.dicc,d.dicc)};
       (d.scores||[]).forEach(s=>{if(!state.scores.some(x=>x.f===s.f&&x.p===s.p))state.scores.push(s)});
       persist();renderAll();toast("Respaldo importado")}catch(e){toast("Ese texto no es un respaldo válido de esta app")}};
   el.querySelector("#impb").onclick=()=>{const v=el.querySelector("#impt").value.trim();if(v) importar(v)};
@@ -1276,6 +1294,88 @@ function renderPlan(){
 }
 
 let prevView="hoy";
+// ---------- diccionario ----------
+let dicQ="", dicRes=null, dicBusy=false, dicMsg="";
+function unirDicc(a,b){const m=new Map();[...(a||[]),...(b||[])].forEach(x=>{if(x&&x.w)m.set(x.w.toLowerCase(),Object.assign({},m.get(x.w.toLowerCase())||{},x))});return [...m.values()]}
+const POS={noun:"sustantivo",verb:"verbo",adjective:"adjetivo",adverb:"adverbio",preposition:"preposición",conjunction:"conjunción",pronoun:"pronombre",interjection:"interjección",determiner:"determinante"};
+function buscarLocal(q){const t=q.toLowerCase(),out=[];
+  for(const k in VOCAB)VOCAB[k].forEach(x=>{if(x[0].toLowerCase()===t||x[1].toLowerCase().split(/[,;]\s*/).includes(t))out.push({w:x[0],es:x[1],ej:x[2],sem:+k})});
+  (state.dicc||[]).forEach(x=>{if(x.w.toLowerCase()===t||(x.es||"").toLowerCase().includes(t))out.push({w:x.w,es:x.es,ipa:x.ipa,guardada:true})});
+  return out}
+async function traducir(q,par){const r=await fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(q)+"&langpair="+par);if(!r.ok)throw 0;const d=await r.json();
+  const main=(d.responseData&&d.responseData.translatedText||"").trim();const alt=[];(d.matches||[]).forEach(m=>{const t=(m.translation||"").trim();if(t&&t.toLowerCase()!==main.toLowerCase()&&t.length<40&&!alt.some(a=>a.toLowerCase()===t.toLowerCase())&&+m.quality>=50)alt.push(t)});
+  return {main,alt:alt.slice(0,3)}}
+async function definir(w){const r=await fetch("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(w.toLowerCase()));if(!r.ok)return null;const d=await r.json();if(!Array.isArray(d)||!d.length)return null;
+  const ph=d.flatMap(e=>e.phonetics||[]), audio=(ph.find(p=>p.audio&&/-us\./.test(p.audio))||ph.find(p=>p.audio)||{}).audio||"";
+  const ipa=d[0].phonetic||(ph.find(p=>p.text)||{}).text||"";
+  const means=d.flatMap(e=>e.meanings||[]).slice(0,3).map(m=>({pos:POS[m.partOfSpeech]||m.partOfSpeech,defs:(m.definitions||[]).slice(0,2).map(x=>({d:x.definition,e:x.example||""})),syn:(m.synonyms||[]).slice(0,5)}));
+  return {w:d[0].word,ipa,audio,means}}
+async function buscarPalabra(q){
+  q=(q||"").trim().replace(/\s+/g," ");if(!q)return;dicQ=q;dicBusy=true;dicMsg="";dicRes=null;renderDic();
+  const local=buscarLocal(q);
+  try{
+    if(IN_VIEWER){
+      if(!sampleFn)throw "nosample";
+      const d=await sampleFn.json(`Eres un diccionario inglés-español para un ingeniero de telecomunicaciones peruano que aprende inglés (nivel B1-B2).
+Busca: "${q}". Si está en español, da la palabra o frase en inglés y explícala igual.
+Responde SOLO con JSON: {"palabra":"en inglés","traduccion":"1 a 3 traducciones al español separadas por coma","ipa":"/transcripción IPA americana/","significados":[{"tipo":"sustantivo|verbo|adjetivo|adverbio|expresión","def":"significado en español, corto","ejemplo":"oración de ejemplo en inglés, de preferencia de trabajo o telecom"}],"sinonimos":["hasta 4"],"nota":"un consejo breve de uso o pronunciación para hispanohablantes"}`,{modelTier:"quick"});
+      dicRes={w:d.palabra||q,es:d.traduccion||"",ipa:d.ipa||"",means:(d.significados||[]).slice(0,3).map(m=>({pos:m.tipo||"",defs:[{d:m.def||"",e:m.ejemplo||""}],syn:[]})),syn:d.sinonimos||[],nota:d.nota||"",fuente:"Claude"};
+    }else{
+      if(navigator.onLine===false)throw "offline";
+      let def=await definir(q).catch(()=>null), es="", alt=[];
+      if(def){const t=await traducir(q,"en|es").catch(()=>null);if(t){es=t.main;alt=t.alt}}
+      else if(!/[áéíóúñ¿¡ü]/i.test(q)&&(await (async()=>{const t1=await traducir(q,"en|es").catch(()=>null);
+          if(t1&&t1.main&&t1.main.toLowerCase()!==q.toLowerCase()){dicRes={w:q,es:[t1.main,...t1.alt].join(", "),ipa:"",audio:"",means:[],fuente:"MyMemory (frase sin definición en el diccionario)"};return true}return false})())){}
+      else{const t=await traducir(q,"es|en").catch(()=>null);if(!t||!t.main||t.main.toLowerCase()===q.toLowerCase())throw "nores";
+        const en=t.main.replace(/[.!?]$/,"");def=await definir(en).catch(()=>null);es=q;alt=[];dicRes={w:en,es:q,ipa:def?def.ipa:"",audio:def?def.audio:"",means:def?def.means:[],desdeEs:true,altEn:t.alt,fuente:"Free Dictionary · MyMemory"}}
+      if(!dicRes)dicRes={w:def.w,es:[es,...alt].filter(Boolean).join(", "),ipa:def.ipa,audio:def.audio,means:def.means,fuente:"Free Dictionary · MyMemory"};
+    }
+  }catch(e){
+    if(local.length){const l=local[0];dicRes={w:l.w,es:l.es,ipa:l.ipa||"",means:l.ej?[{pos:"",defs:[{d:"",e:l.ej}],syn:[]}]:[],fuente:"tus listas"};dicMsg=e==="offline"?"Sin internet: te muestro lo que hay en tus listas.":""}
+    else dicMsg=e==="offline"?"Sin internet solo puedo buscar en tus listas de vocabulario, y no está ahí. Prueba con los enlaces de abajo cuando tengas conexión.":e==="nosample"?"Aquí no puedo consultar a Claude. Usa los enlaces de abajo.":"No encontré esa palabra. Revisa cómo está escrita o prueba con los enlaces de abajo.";
+  }
+  dicBusy=false;renderDic();
+}
+function sonarPalabra(){if(!dicRes)return;if(dicRes.audio){try{const a=new Audio(dicRes.audio);a.play().catch(()=>hablar(dicRes.w,.85));return}catch(e){}}hablar(dicRes.w,.85)}
+function renderDic(){
+  const el=document.getElementById("v-dic"); if(!el) return; const r=dicRes, enc=encodeURIComponent(r?r.w:dicQ);
+  const guardada=r&&(state.dicc||[]).some(x=>x.w.toLowerCase()===r.w.toLowerCase());
+  el.innerHTML=`<div class="wrap" style="gap:14px">
+  <div><button class="iconbtn txt" id="dicback" type="button">‹ Volver</button></div>
+  <section class="card"><h2>Diccionario</h2>
+    <form class="dform" id="dicform"><input type="search" id="dicq" value="${esc(dicQ)}" placeholder="Palabra en inglés o español" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="search"><button class="btn" type="submit">Buscar</button></form>
+    ${dicBusy?'<p class="note">Buscando…</p>':""}${dicMsg?`<p class="note">${esc(dicMsg)}</p>`:""}
+  </section>
+  ${r?`<section class="card">
+    <div class="dword"><h2>${esc(r.w)}</h2>${r.ipa?`<span class="ipa">${esc(r.ipa)}</span>`:""}</div>
+    ${r.es?`<div class="tr">${esc(r.es)}</div>`:""}
+    ${r.desdeEs&&r.altEn&&r.altEn.length?`<p class="note">También: ${r.altEn.map(esc).join(", ")}</p>`:""}
+    <div class="btnrow"><button class="btn ghost" id="dsay" type="button">🔊 Escuchar</button><button class="btn ghost" id="dslow" type="button">🐢 Lento</button><button class="btn${guardada?" ghost":""}" id="dsave" type="button" ${guardada||!canWrite?"disabled":""}>${guardada?"Guardada ✓":"Guardar en mis palabras"}</button></div>
+    ${r.means.map(m=>`<div>${m.pos?`<span class="pos">${esc(m.pos)}</span>`:""}<ol class="defs">${m.defs.map(x=>`<li>${esc(x.d)}${x.e?`<span class="eg">${esc(x.e)} <button class="exsay" type="button" data-say="${esc(x.e)}" aria-label="Escuchar ejemplo">🔊</button></span>`:""}</li>`).join("")}</ol>
+      ${m.syn&&m.syn.length?`<div class="chips2" style="margin-top:6px">${m.syn.map(y=>`<button class="chip2" type="button" data-buscar="${esc(y)}">${esc(y)}</button>`).join("")}</div>`:""}</div>`).join("")}
+    ${r.syn&&r.syn.length?`<div><span class="pos">Sinónimos</span><div class="chips2" style="margin-top:6px">${r.syn.map(y=>`<button class="chip2" type="button" data-buscar="${esc(y)}">${esc(y)}</button>`).join("")}</div></div>`:""}
+    ${r.nota?`<p class="note">${esc(r.nota)}</p>`:""}
+    <p class="note">Fuente: ${esc(r.fuente||"")}${r.means.length&&!IN_VIEWER&&r.fuente!=="tus listas"?" (definiciones en inglés: léelas, también es práctica)":""}.</p>
+  </section>`:""}
+  ${dicQ?`<section class="card"><span class="eyebrow">Ver también</span><div class="chips2">
+    <a class="chip2" href="https://www.wordreference.com/es/translation.asp?tranword=${enc}" target="_blank" rel="noopener">WordReference ↗</a>
+    <a class="chip2" href="https://dictionary.cambridge.org/search/direct/?datasetsearch=english-spanish&q=${enc}" target="_blank" rel="noopener">Cambridge inglés-español ↗</a>
+    <a class="chip2" href="https://youglish.com/pronounce/${enc}/english" target="_blank" rel="noopener">Escucharla en videos ↗</a></div></section>`:""}
+  <section class="card"><h3>Mis palabras${(state.dicc||[]).length?" ("+state.dicc.length+")":""}</h3>
+    ${(state.dicc||[]).length?`<div class="saved">${[...state.dicc].reverse().map(x=>`<div class="savedi"><div><b>${esc(x.w)}</b> ${x.ipa?`<span>${esc(x.ipa)}</span>`:""}<br><span>${esc(x.es||"")}</span></div><span class="acts"><button class="sbtn" type="button" data-buscar="${esc(x.w)}">Ver</button> <button class="sbtn" type="button" data-dsay="${esc(x.w)}">🔊</button> <button class="sbtn" type="button" data-ddel="${esc(x.w)}">Borrar</button></span></div>`).join("")}</div>
+      <button class="btn ghost" id="dcopy" type="button">Copiar para Anki</button>`:'<p class="note">Las palabras que guardes aparecen aquí, para repasarlas y pasarlas a Anki.</p>'}
+  </section></div>`;
+  el.querySelector("#dicback").onclick=()=>show(prevView);
+  el.querySelector("#dicform").onsubmit=e=>{e.preventDefault();const i=el.querySelector("#dicq");i.blur();buscarPalabra(i.value)};
+  el.querySelectorAll("[data-buscar]").forEach(b=>b.onclick=()=>{buscarPalabra(b.dataset.buscar);scrollTo(0,0)});
+  el.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>hablar(b.dataset.say,.85));
+  el.querySelectorAll("[data-dsay]").forEach(b=>b.onclick=()=>hablar(b.dataset.dsay,.8));
+  el.querySelectorAll("[data-ddel]").forEach(b=>b.onclick=()=>{state.dicc=(state.dicc||[]).filter(x=>x.w!==b.dataset.ddel);persist();renderDic()});
+  const sy=el.querySelector("#dsay");if(sy)sy.onclick=sonarPalabra;
+  const sl=el.querySelector("#dslow");if(sl)sl.onclick=()=>hablar(r.w,.55);
+  const sv=el.querySelector("#dsave");if(sv)sv.onclick=()=>{state.dicc=unirDicc(state.dicc,[{w:r.w,es:r.es,ipa:r.ipa,f:key(today())}]);persist();renderDic();toast("Guardada en tus palabras")};
+  const cp=el.querySelector("#dcopy");if(cp)cp.onclick=()=>{const t=state.dicc.map(x=>x.w+"\t"+(x.es||"")+(x.ipa?" "+x.ipa:"")).join("\n");try{navigator.clipboard.writeText(t).then(()=>toast("Lista copiada"),()=>toast("No se pudo copiar"))}catch(e){toast("No se pudo copiar")}};
+}
 function renderPerfil(){
   const el=document.getElementById("v-perfil"), pf=state.perfil||{}, dx=diasExamen();
   el.innerHTML=`<div class="wrap" style="gap:14px">
@@ -1312,11 +1412,12 @@ function renderPerfil(){
       c.getContext("2d").drawImage(img,(img.width-k)/2,(img.height-k)/2,k,k,0,0,S,S);set({tipo:"foto",foto:c.toDataURL("image/jpeg",.82)});toast("Foto actualizada")};
       img.onerror=()=>toast("No pude abrir esa imagen");img.src=rd.result};rd.readAsDataURL(f)};
 }
-function renderAll(){renderTop();renderPerfil();renderHoy();renderSemana();renderAvance();renderErrores();renderPlan()}
+function renderAll(){renderTop();renderPerfil();renderDic();renderHoy();renderSemana();renderAvance();renderErrores();renderPlan()}
 function show(v){document.querySelectorAll(".tabbar button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
-  ["hoy","semana","avance","errores","plan","perfil"].forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
+  ["hoy","semana","avance","errores","plan","perfil","dic"].forEach(x=>document.getElementById("v-"+x).hidden=x!==v);
   window.scrollTo(0,0);try{localStorage.setItem(LS+"-tab",v)}catch(e){}}
 document.querySelectorAll(".tabbar button").forEach(b=>b.onclick=()=>show(b.dataset.view));
+document.getElementById("dicbtn").onclick=()=>{const cur=["hoy","semana","avance","errores","plan"].find(x=>!document.getElementById("v-"+x).hidden);if(cur)prevView=cur;show("dic");setTimeout(()=>{const i=document.getElementById("dicq");if(i)i.focus()},50)};
 document.getElementById("avbtn").onclick=()=>{const cur=["hoy","semana","avance","errores","plan"].find(x=>!document.getElementById("v-"+x).hidden);if(cur)prevView=cur;show("perfil")};
 
 loadLocal(); renderAll();
@@ -1336,7 +1437,7 @@ if(IN_VIEWER)(async()=>{
   ref.onSnapshot(snap=>{
     if(!snap.metadata.fromCache) clearTimeout(timer);
     mode="db";
-    if(snap.exists){const d=snap.data(), remote={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{},perfil:d.perfil||{}};
+    if(snap.exists){const d=snap.data(), remote={checks:d.checks||{},hitos:d.hitos||{},scores:d.scores||[],errores:d.errores||[],vocab:d.vocab||{},pron:d.pron||{},gram:d.gram||{},vq:d.vq||{},perfil:d.perfil||{},dicc:d.dicc||[]};
       // la copia en la nube manda; se ignoran copias viejas y lo que llega justo después de tocar algo
       if(snap.metadata.fromCache||snap.metadata.hasPendingWrites) return;
       if(pending>0||Date.now()-lastEdit<2500){if(primera){primera=false;if(pending===0)persist()}return;}
