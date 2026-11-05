@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1f6feb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -68,6 +68,9 @@
 .focustip{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--flame-soft);color:var(--ink);font-size:14px}
 .focustip b{color:var(--flame)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* Evita el zoom por doble toque en iPhone y el zoom automático al escribir (iOS acerca si el texto del campo mide menos de 16px) */
+html,body,*{touch-action:manipulation}
+input,select,textarea{font-size:16px!important}
 html,body{min-height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;margin:0;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
