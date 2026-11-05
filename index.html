@@ -605,6 +605,9 @@ function guardarVistas(day,set){try{localStorage.setItem(HKEY,JSON.stringify({da
 const bk=x=>x.w+":"+x.i;
 function porBase(list){const m=new Map();list.forEach(x=>{const k=bk(x);if(!m.has(k))m.set(k,[]);m.get(k).push(x)});return m}
 function mejorVariante(vars,r,all){const c=shuffle(vars,r).filter(x=>all||gst(x)!==1).sort((p,q)=>RANK[gst(p)]-RANK[gst(q)]);return c[0]||null}
+// errores pendientes: una versión fallada por frase, del tema actual y de semanas anteriores
+function errPend(s){const pool=[...poolWeek(s)];if(s!==8&&s<23)for(let w=1;w<s;w++)if(GRAM[w]&&GRAM[w].q.length)pool.push(...poolWeek(w));
+  const out=[];for(const [k,vars] of porBase(pool)){const v=vars.find(x=>gst(x)===0)||vars.find(x=>gst(x)===2);if(v)out.push(v)}return out}
 function getSet(s,day,round){
   const key=day+":"+round; if(quizSets[key]) return quizSets[key];
   const all=!!quizAll[day], r=rng(day*97+round*7919+13), vistas=vistasHoy(day);
@@ -612,6 +615,7 @@ function getSet(s,day,round){
       const v=soloRepaso?shuffle(vars,r).find(x=>gst(x)===0||gst(x)===2):mejorVariante(vars,r,all);if(v)out.push(v)}
     return out.sort((p,q)=>RANK[gst(p)]-RANK[gst(q)]).slice(0,n)};
   const prev=[]; if(s!==8&&s<23) for(let w=1;w<s;w++) if(GRAM[w]&&GRAM[w].q.length) prev.push(...poolWeek(w));
+  if(all){const set=shuffle(errPend(s),r).slice(0,10);quizSets[key]=set;return set}
   const B=elegir(prev,3,true), A=elegir(poolWeek(s),B.length?7:7,false);
   const set=shuffle([...A,...B],r);
   if(!all){set.forEach(x=>vistas.add(bk(x)));guardarVistas(day,vistas)}
@@ -644,20 +648,21 @@ function bindEstr(el,s){
 }
 function practicaCard(s){
   const w=SEMANAS[s-1], link=s===1?"https://test-english.com/grammar-points/b1/present-simple-present-continuous/":practicaURL(s), lvl=s<=10?"B1":"B2";
-  const bank=poolWeek(s), dom=bank.filter(dominado).length, rev=bank.filter(x=>gst(x)===0||gst(x)===2).length;
+  const bank=poolWeek(s), dom=bank.filter(dominado).length, rev=bank.filter(x=>gst(x)===0||gst(x)===2).length, nErr=errPend(s).length;
   const head=foldHead("q",openQ,"Práctica de gramática",w[0],dom+"/"+bank.length,"c-gram");
   if(!openQ) return `<section class="card fold" id="quiz" data-state="false" style="--fc:var(--c-gram);--fc-soft:var(--c-gram-soft)">${head}</section>`;
   const Q=quizItems(s), sel=quizSel[Q.key]||{}, answered=Object.keys(sel).length, ok=Q.items.filter((it,i)=>sel[i]===it.q[2]).length;
   const expl=GRAM[s]&&GRAM[s].e?GRAM[s].e:(s===8?"Semana de repaso: preguntas de las semanas 1 a 7, primero las que fallaste.":"Repaso general: preguntas de todas las semanas, primero las que fallaste.");
   return `<section class="card fold" id="quiz" data-state="true" style="--fc:var(--c-gram);--fc-soft:var(--c-gram-soft)">${head}
     <p class="note">${esc(expl)} <a class="link" href="#estr" data-open="e">Ver estructura ↑</a></p>
-    <div class="dayhead"><span class="eyebrow" style="color:var(--c-gram)">${Q.ai?"Preguntas nuevas de Claude":quizAll[viewIdx]?"Repaso libre":"Ronda "+(Q.round+1)+" de hoy · "+vistasHoy(viewIdx).size+" frases vistas"}</span><span class="score num">${answered?ok+"/"+Q.items.length:""}</span></div>
+    <div class="dayhead"><span class="eyebrow" style="color:var(--c-gram)">${Q.ai?"Preguntas nuevas de Claude":quizAll[viewIdx]?"Repaso de errores · solo lo que fallaste":"Ronda "+(Q.round+1)+" de hoy · "+vistasHoy(viewIdx).size+" frases vistas"}</span><span class="score num">${answered?ok+"/"+Q.items.length:""}</span></div>
     ${Q.items.map((it,i)=>{const x=it.q,a=sel[i];return `<div class="q">${it.x&&it.x.w!==s&&GRAM[s]&&GRAM[s].q.length?`<span class="eyebrow">Repaso · ${esc(SEMANAS[it.x.w-1][0])}</span>`:""}<span class="s">${i+1}. ${esc(x[0])}</span>
       <div class="opts">${x[1].map((o,j)=>`<button class="opt${a!==undefined?(j===x[2]?" right":(j===a?" wrong":"")):""}" data-q="${i}" data-o="${j}" ${a!==undefined?"disabled":""} type="button">${esc(o)}</button>`).join("")}</div>
       ${a!==undefined?`<span class="why">${a===x[2]?"Correcto. ":"Era «"+esc(x[1][x[2]])+"». "}${esc(x[3]||"")}</span>`:""}</div>`}).join("")}
-    ${!Q.ai&&!Q.items.length?`<div class="fbi" style="background:var(--good-soft)"><b style="color:var(--good)">${dom===bank.length?"¡Dominaste todo este tema!":"Terminaste la práctica de hoy."}</b><span class="why" style="color:var(--ink)">${dom===bank.length?"Acertaste los "+bank.length+" ejercicios. Mañana tendrás solo repaso.":"Ya viste todas las frases del tema hoy. Mañana salen las versiones que te faltan y las que fallaste."}</span></div>`:""}
-    <div class="btnrow">${!Q.ai&&!Q.items.length?`<button class="btn ghost" id="qall" type="button">Repasar frases ya vistas</button>`:`<button class="btn" id="qmore" type="button">${quizAll[viewIdx]?"Otra ronda de repaso":"Siguiente ronda"}</button>`}${sampleFn?`<button class="btn ghost" id="qai" type="button" ${quizBusy?"disabled":""}>${quizBusy?"Creando…":"10 nuevas con Claude"}</button>`:""}</div>
-    <p class="note">Dominas <b>${dom} de ${bank.length}</b> ejercicios${rev?` · <b style="color:var(--bad)">${rev} por repasar</b>`:""}. El total nunca baja: si fallas uno que ya dominabas, queda marcado para repasar. Cada frase sale una sola vez al día. <a class="link" href="${link}" target="_blank" rel="noopener">Teoría ${lvl} en Test-English ↗</a></p>
+    ${!Q.ai&&!Q.items.length?`<div class="fbi" style="background:var(--good-soft)"><b style="color:var(--good)">${quizAll[viewIdx]?"¡Corregiste todos tus errores!":dom===bank.length?"¡Dominaste todo este tema!":"Terminaste la práctica de hoy."}</b><span class="why" style="color:var(--ink)">${quizAll[viewIdx]?"No te queda ninguna pregunta fallada por repasar.":dom===bank.length?"Acertaste los "+bank.length+" ejercicios.":"Ya viste todas las frases del tema hoy. Mañana salen las versiones que te faltan."}${!quizAll[viewIdx]&&nErr?" Tienes "+nErr+" pregunta"+(nErr===1?"":"s")+" fallada"+(nErr===1?"":"s")+" para corregir.":""}</span></div>`:""}
+    ${quizAll[viewIdx]&&Q.items.length&&answered===Q.items.length&&!nErr?`<div class="fbi" style="background:var(--good-soft)"><b style="color:var(--good)">¡Corregiste todos tus errores!</b><span class="why" style="color:var(--ink)">No te queda ninguna pregunta fallada. Vuelve mañana para seguir.</span></div>`:""}
+    <div class="btnrow">${Q.ai?`<button class="btn" id="qmore" type="button">Volver a mi práctica</button>`:quizAll[viewIdx]?(Q.items.length&&nErr?`<button class="btn" id="qmore" type="button">Siguiente ronda de errores (${nErr})</button>`:""):(Q.items.length?`<button class="btn" id="qmore" type="button">Siguiente ronda</button>`:(nErr?`<button class="btn" id="qall" type="button" style="background:var(--bad)">Repasar mis errores (${nErr})</button>`:""))}${sampleFn?`<button class="btn ghost" id="qai" type="button" ${quizBusy?"disabled":""}>${quizBusy?"Creando…":"10 nuevas con Claude"}</button>`:""}</div>
+    <p class="note">Dominas <b>${dom} de ${bank.length}</b> ejercicios${rev?` · <b style="color:var(--bad)">${rev} por repasar</b>`:""}. El total nunca baja. Cada frase sale una sola vez al día; al terminar, repasas solo las que fallaste. <a class="link" href="${link}" target="_blank" rel="noopener">Teoría ${lvl} en Test-English ↗</a></p>
   </section>`;
 }
 function bindQuiz(el,s){
