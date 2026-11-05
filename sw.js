@@ -1,6 +1,6 @@
 // Guarda la app en el teléfono para que abra sin internet.
 // Con internet trae siempre la versión más nueva; sin internet usa la copia guardada.
-const CACHE="ruta-ingles-v23";
+const CACHE="ruta-ingles-v24";
 const FILES=["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","icon-maskable.png","apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(u=>new Request(u,{cache:"reload"})))));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith("ruta-ingles-")&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

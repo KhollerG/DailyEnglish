@@ -316,6 +316,9 @@ a.link{color:var(--c-gram);font-weight:600}
 .vitem .w{font:700 16px var(--display);color:var(--ink)}
 .vitem .es{font-size:13.5px;color:var(--c-vocab);font-weight:600}
 .vitem .ex{grid-column:1/-1;font-size:13.5px;color:var(--muted);font-style:italic}
+.vpr{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.vbtn{font:600 12.5px var(--body);padding:5px 11px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c-vocab) 45%,transparent);background:var(--surface);color:var(--c-vocab);text-decoration:none;cursor:pointer;touch-action:manipulation}
+.exsay{border:0;background:transparent;padding:0;font-size:14px;cursor:pointer;font-style:normal}
 .vitem.known{background:var(--surface2)}
 .vitem.known .w{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--c-vocab)}
 .know{font:600 12.5px var(--body);border:2px solid var(--c-vocab);background:var(--surface);color:var(--c-vocab);border-radius:999px;padding:4px 11px;cursor:pointer;white-space:nowrap}
@@ -745,9 +748,10 @@ function vocabCard(s){
     <ul class="vlist">${list.map((x,i)=>{const on=!!state.vocab[vw+":"+i];return `<li class="vitem${on?" known":""}">
       <span><span class="w">${esc(x[0])}</span><br><span class="es">${esc(x[1])}</span></span>
       <button class="know${on?" on":""}" data-v="${vw}:${i}" type="button" ${canWrite?"":"disabled"}>${on?"La sé ✓":"La sé"}</button>
-      <span class="ex">${esc(x[2])}</span></li>`}).join("")}</ul>
+      <span class="ex"><button class="exsay" type="button" data-say="${esc(x[2])}" aria-label="Escuchar el ejemplo">🔊</button> ${esc(x[2])}</span>
+      <span class="vpr"><button class="vbtn" type="button" data-say="${esc(x[0])}" data-rate=".85">🔊 Escuchar</button><button class="vbtn" type="button" data-say="${esc(x[0])}" data-rate=".55">🐢 Lento</button><a class="vbtn" href="https://dictionary.cambridge.org/search/direct/?datasetsearch=english&q=${encodeURIComponent(x[0])}" target="_blank" rel="noopener">Fonética ↗</a></span></li>`}).join("")}</ul>
     ${vquiz&&vquiz.vw===vw?`<div class="fb"><div class="dayhead"><span class="eyebrow" style="color:var(--c-vocab)">Ponte a prueba</span><span class="score num" style="color:var(--c-vocab)">${Object.keys(vquiz.sel).length?vquiz.items.filter((x,k)=>vquiz.sel[k]===vQ(x).c).length+"/"+vquiz.items.length:""}</span></div>
-      ${vquiz.items.map((x,k)=>{const q=vQ(x),a=vquiz.sel[k];return `<div class="q">${x.w!==vw?'<span class="eyebrow">Repaso · semana '+x.w+'</span>':""}<span class="s">${k+1}. ${esc(q.s)}</span><div class="opts">${q.opts.map((o,j)=>`<button class="opt${a!==undefined?(j===q.c?" right":(j===a?" wrong":"")):""}" style="border-color:var(--c-vocab);color:${a!==undefined&&(j===q.c||j===a)?"":"var(--c-vocab)"}" data-vq="${k}" data-vo="${j}" ${a!==undefined?"disabled":""} type="button">${esc(o)}</button>`).join("")}</div>${a!==undefined?`<span class="why">${a===q.c?"Correcto. ":""}${esc(q.w)} = ${esc(q.m)}. «${esc(q.ex)}»</span>`:""}</div>`}).join("")}</div>`:""}
+      ${vquiz.items.map((x,k)=>{const q=vQ(x),a=vquiz.sel[k];return `<div class="q">${x.w!==vw?'<span class="eyebrow">Repaso · semana '+x.w+'</span>':""}<span class="s">${k+1}. ${esc(q.s)}</span><div class="opts">${q.opts.map((o,j)=>`<button class="opt${a!==undefined?(j===q.c?" right":(j===a?" wrong":"")):""}" style="border-color:var(--c-vocab);color:${a!==undefined&&(j===q.c||j===a)?"":"var(--c-vocab)"}" data-vq="${k}" data-vo="${j}" ${a!==undefined?"disabled":""} type="button">${esc(o)}</button>`).join("")}</div>${a!==undefined?`<span class="why">${a===q.c?"Correcto. ":""}${esc(q.w)} = ${esc(q.m)}. «${esc(q.ex)}» <button class="exsay" type="button" data-say="${esc(q.w)}" aria-label="Escuchar">🔊</button></span>`:""}</div>`}).join("")}</div>`:""}
     <div class="btnrow"><button class="btn" id="vtest" type="button" style="background:var(--c-vocab)">${vquiz&&vquiz.vw===vw?"Otras 10 preguntas":"Ponme a prueba (10 preguntas)"}</button></div>
     <div class="btnrow"><button class="btn ghost" id="vcopy" type="button">Copiar lista para Anki</button>${IN_VIEWER?"":'<button class="btn ghost" id="vdl" type="button">Descargar para Anki</button>'}</div>
     <p class="note">Meta diaria: aprende 2 o 3 palabras y súmalas a Anki. Una palabra se marca sola como aprendida cuando aciertas su significado y su traducción.</p>`}
@@ -758,6 +762,7 @@ function bindVocab(el,s){
   el.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{const k=b.dataset.v;if(state.vocab[k])delete state.vocab[k];else state.vocab[k]=true;
     persist();const y=window.scrollY;renderHoy();window.scrollTo(0,y)});
   if(!el.querySelector("#vprev")) return;
+  el.querySelectorAll("#vocab [data-say]").forEach(b=>b.onclick=()=>hablar(b.dataset.say,+(b.dataset.rate||.85)));
   el.querySelector("#vtest").onclick=()=>{nuevoVquiz(vw);const y=scrollY;renderHoy();scrollTo(0,y)};
   el.querySelectorAll("[data-vq]").forEach(b=>b.onclick=()=>{const k=+b.dataset.vq,o=+b.dataset.vo;if(vquiz.sel[k]!==undefined)return;vquiz.sel[k]=o;
     const x=vquiz.items[k],good=o===vQ(x).c;state.vq[vk(x)]=good?1:0;
