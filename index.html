@@ -978,8 +978,9 @@ function pronCard(s){
       <div class="arrows"><button class="iconbtn" id="pprev" aria-label="Frase anterior" ${i===0?"disabled":""}>‹</button><button class="iconbtn" id="pnext" aria-label="Frase siguiente" ${i>=L.length-1?"disabled":""}>›</button></div></div>
     <div class="target">${esc(target)}</div>
     <div class="prow"><button class="btn ghost" id="plisten" type="button">🔊 Escuchar</button><button class="btn ghost" id="pslow" type="button">Lento</button></div><p class="note" style="margin-top:-6px">Si no suena con el iPhone en silencio, desactiva el modo silencio (botón lateral) y sube el volumen.</p>
-    <div class="prow">${SR?`<button class="micbig${pron.listening?" on":""}" id="pmic" type="button" aria-label="${pron.listening?"Detener":"Decir la frase"}"><svg><use href="#${pron.listening?"i-stop":"i-mic"}"/></svg></button><span class="note">${pron.listening?"Escuchando… di la frase":"Toca y di la frase"}</span>`:`<span class="note">Toca el recuadro, luego el <b>micrófono del teclado</b>, y di la frase.</span>`}</div>
-    <textarea id="pheard" style="min-height:64px;font:500 14.5px var(--body)" placeholder="Aquí aparece lo que el celular entendió">${esc(pron.heard)}</textarea>
+    ${SR&&!srFalla?`<div class="prow"><button class="micbig${pron.listening?" on":""}" id="pmic" type="button" aria-label="${pron.listening?"Detener":"Decir la frase"}"><svg><use href="#${pron.listening?"i-stop":"i-mic"}"/></svg></button><span class="note">${pron.listening?"Escuchando… di la frase":"Toca y di la frase"}</span></div>`
+      :`<div class="tip" style="background:var(--c-shadow-soft)"><b>Dicta la frase con el teclado</b><span>1. Toca el recuadro de abajo. 2. Toca el <b>🎤</b> del teclado (abajo a la derecha). 3. Di la frase. Se compara sola al terminar.</span>${SR?'<button class="sbtn" id="pretry" type="button" style="align-self:flex-start">Probar otra vez el micrófono de la app</button>':""}</div>`}
+    <textarea id="pheard" style="min-height:64px;font:500 14.5px var(--body)" placeholder="${SR&&!srFalla?"Aquí aparece lo que el celular entendió":"Toca aquí y luego el 🎤 del teclado"}">${esc(pron.heard)}</textarea>
     <div><button class="btn" id="pcheck" type="button">Comparar</button></div>
     ${r?`<div class="fb">
       <div class="prow"><span class="pscore num" style="color:${r.score>=90?"var(--good)":r.score>=70?"var(--c-vocab)":"var(--c-speak)"}">${r.score}%</span><span class="note">${r.score>=90?"¡Se te entendió muy bien!":r.score>=70?"Bien. Repite las palabras en rojo.":"Varias palabras no se entendieron. Escucha y vuelve a intentar."}</span></div>
@@ -990,10 +991,17 @@ function pronCard(s){
   </section>`;
 }
 let pronSR=null;
+const SRKEY="ruta-ingles-srfalla";
+let srFalla=false; try{srFalla=localStorage.getItem(SRKEY)==="1"}catch(e){}
+const marcarSrFalla=v=>{srFalla=v;try{localStorage.setItem(SRKEY,v?"1":"0")}catch(e){}};
+let pronAuto=null, pronVacios=0;
 function bindPron(el,s){
   if(!el.querySelector("#pheard")) return;
   const L=pronList(s), sw=Math.min(s,22), i=Math.min(pron.i,L.length-1), target=L[i];
-  const ta=el.querySelector("#pheard"); ta.oninput=()=>{pron.heard=ta.value};
+  const ta=el.querySelector("#pheard");
+  // al dictar con el teclado, compara solo cuando dejas de hablar
+  ta.oninput=()=>{pron.heard=ta.value;clearTimeout(pronAuto);if(ta.value.trim().split(/\s+/).length>=2)pronAuto=setTimeout(()=>{if(document.activeElement===ta||true){ta.blur();check()}},1800)};
+  const rt=el.querySelector("#pretry"); if(rt) rt.onclick=()=>{marcarSrFalla(false);rerenderRec()};
   el.querySelector("#pprev").onclick=()=>{pron.i=Math.max(0,i-1);pron.res=null;pron.heard="";pron.sel=null;rerenderRec()};
   el.querySelector("#pnext").onclick=()=>{pron.i=Math.min(L.length-1,i+1);pron.res=null;pron.heard="";pron.sel=null;rerenderRec()};
   el.querySelector("#plisten").onclick=()=>hablar(target,.9);
@@ -1010,8 +1018,11 @@ function bindPron(el,s){
     if(pron.listening){try{pronSR&&pronSR.stop()}catch(e){}return}
     try{pronSR=new SR();pronSR.lang="en-US";pronSR.interimResults=true;pronSR.continuous=false;
       pronSR.onresult=ev=>{let t="";for(let k=0;k<ev.results.length;k++)t+=ev.results[k][0].transcript;pron.heard=t;const x=document.getElementById("pheard");if(x)x.value=t};
-      pronSR.onend=()=>{pron.listening=false;if(pron.heard.trim()){const x=document.getElementById("pheard");if(x)x.value=pron.heard;check()}else rerenderRec()};
-      pronSR.onerror=e=>{pron.listening=false;toast(e&&e.error==="not-allowed"?"Permite el micrófono para practicar":"No te escuché. Usa el micrófono del teclado.");rerenderRec()};
+      pronSR.onend=()=>{const was=pron.listening;pron.listening=false;if(pron.heard.trim()){const x=document.getElementById("pheard");if(x)x.value=pron.heard;check()}else{if(was&&!srFalla){pronVacios=(pronVacios||0)+1;if(pronVacios>=2){marcarSrFalla(true);toast("El micrófono de la app no funciona aquí. Usa el 🎤 del teclado.")}}rerenderRec()}};
+      pronSR.onerror=e=>{pron.listening=false;const er=e&&e.error;
+        if(er==="no-speech"){toast("No te escuché. Toca de nuevo y habla un poco más fuerte.");rerenderRec();return}
+        marcarSrFalla(true);
+        toast(er==="not-allowed"||er==="service-not-allowed"?"El iPhone no deja usar el micrófono aquí. Usa el 🎤 del teclado.":"Usa el 🎤 del teclado para dictar la frase.");rerenderRec()};
       pron.heard="";pron.res=null;pron.listening=true;pronSR.start();rerenderRec()}
     catch(e){pron.listening=false;toast("Usa el micrófono del teclado");rerenderRec()}};
 }
