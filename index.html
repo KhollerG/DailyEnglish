@@ -1030,12 +1030,12 @@ function bindPron(el,s){
   if(mic) mic.onclick=()=>{
     if(pron.listening){try{pronSR&&pronSR.stop()}catch(e){}return}
     prepararMic();let vigia=null,oyo=false;
-    try{pronSR=new SR();pronSR.lang="en-US";pronSR.interimResults=true;pronSR.continuous=false;
+    try{pronSR=new SR();pronSR.lang="en-US";pronSR.interimResults=true;pronSR.continuous=true;let calla=null;
       vigia=setTimeout(()=>{if(pron.listening&&!oyo){try{pronSR.abort()}catch(e){}pron.listening=false;liberarMic();
         marcarSrFalla(true);toast("El micrófono de la app no captó tu voz. Usa el 🎤 del teclado (abajo).");rerenderRec()}},7000);
-      pronSR.onresult=ev=>{oyo=true;let t="";for(let k=0;k<ev.results.length;k++)t+=ev.results[k][0].transcript;pron.heard=t;const x=document.getElementById("pheard");if(x)x.value=t};
-      pronSR.onend=()=>{clearTimeout(vigia);liberarMic();const was=pron.listening;pron.listening=false;if(pron.heard.trim()){const x=document.getElementById("pheard");if(x)x.value=pron.heard;check()}else{if(was&&!srFalla){pronVacios=(pronVacios||0)+1;if(pronVacios>=2){marcarSrFalla(true);toast("El micrófono de la app no funciona aquí. Usa el 🎤 del teclado.")}}rerenderRec()}};
-      pronSR.onerror=e=>{clearTimeout(vigia);liberarMic();if(!pron.listening)return;pron.listening=false;const er=e&&e.error;
+      pronSR.onresult=ev=>{oyo=true;let t="";for(let k=0;k<ev.results.length;k++)t+=(k?" ":"")+ev.results[k][0].transcript.trim();pron.heard=t;/* espera 1.8 s de silencio antes de cortar, para no perder el final de la frase */clearTimeout(calla);calla=setTimeout(()=>{try{pronSR.stop()}catch(e){}},1800);const x=document.getElementById("pheard");if(x)x.value=t};
+      pronSR.onend=()=>{clearTimeout(vigia);clearTimeout(calla);liberarMic();const was=pron.listening;pron.listening=false;const nO=pron.heard.trim().split(/\s+/).filter(Boolean).length,nT=target.split(/\s+/).length;if(nO&&nO<Math.ceil(nT*.5)){const x=document.getElementById("pheard");if(x)x.value=pron.heard;toast("Se cortó a la mitad. Toca el micrófono y di la frase completa sin pausas largas.");rerenderRec();return}if(pron.heard.trim()){const x=document.getElementById("pheard");if(x)x.value=pron.heard;check()}else{if(was&&!srFalla){pronVacios=(pronVacios||0)+1;if(pronVacios>=2){marcarSrFalla(true);toast("El micrófono de la app no funciona aquí. Usa el 🎤 del teclado.")}}rerenderRec()}};
+      pronSR.onerror=e=>{clearTimeout(vigia);clearTimeout(calla);liberarMic();if(!pron.listening)return;pron.listening=false;const er=e&&e.error;
         if(er==="no-speech"){toast("No te escuché. Toca de nuevo y habla un poco más fuerte.");rerenderRec();return}
         marcarSrFalla(true);
         toast(er==="not-allowed"||er==="service-not-allowed"?"El iPhone no deja usar el micrófono aquí. Usa el 🎤 del teclado.":"Usa el 🎤 del teclado para dictar la frase.");rerenderRec()};
