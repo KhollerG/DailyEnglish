@@ -867,13 +867,13 @@ function recCard(s){
 }
 function rerenderRec(){const y=scrollY;renderHoy();scrollTo(0,y)}
 async function empezarGrabacion(){
-  rec.error="";
+  rec.error="";prepararMic();
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true});
     const type=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
     recMR=new MediaRecorder(stream,type?{mimeType:type}:undefined); recChunks=[];
     recMR.ondataavailable=e=>{if(e.data&&e.data.size)recChunks.push(e.data)};
-    recMR.onstop=()=>{stream.getTracks().forEach(t=>t.stop());
+    recMR.onstop=()=>{stream.getTracks().forEach(t=>t.stop());liberarMic();
       rec.blob=new Blob(recChunks,{type:recMR.mimeType||type||"audio/mp4"}); if(rec.url)URL.revokeObjectURL(rec.url); rec.url=URL.createObjectURL(rec.blob);
       rec.status="done"; rec.elapsed=Date.now()-rec.t0;
       const item={id:rec.t0,dur:rec.elapsed,blob:rec.blob,txt:rec.txt};
@@ -955,10 +955,15 @@ try{if(window.speechSynthesis){elegirVoz();speechSynthesis.onvoiceschanged=elegi
 // y reproducir un audio mudo para que el sistema trate la app como reproductor.
 let mudoEl=null;
 function activarAudio(){
+  if(pron.listening||rec.status==="recording")return;
   try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
   try{if(!mudoEl){mudoEl=new Audio("data:audio/wav;base64,UklGRqQMAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YYAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==");mudoEl.loop=true;mudoEl.setAttribute("playsinline","");mudoEl.volume=0.01}const pr=mudoEl.play();if(pr&&pr.catch)pr.catch(()=>{})}catch(e){}
 }
 function soltarAudio(){try{mudoEl&&mudoEl.pause()}catch(e){}}
+// antes de usar el micrófono: soltar el modo "solo reproducción", si no iOS no entrega la voz
+function prepararMic(){try{mudoEl&&mudoEl.pause()}catch(e){}try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
+  try{if(navigator.audioSession)navigator.audioSession.type="play-and-record"}catch(e){}}
+function liberarMic(){try{if(navigator.audioSession)navigator.audioSession.type="auto"}catch(e){}}
 function hablar(txt,rate){
   if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){toast("Este navegador no puede leer en voz alta");return}
   activarAudio();
@@ -1011,7 +1016,7 @@ function bindPron(el,s){
   el.querySelector("#pnext").onclick=()=>{pron.i=Math.min(L.length-1,i+1);pron.res=null;pron.heard="";pron.sel=null;rerenderRec()};
   el.querySelector("#plisten").onclick=()=>hablar(target,.9);
   el.querySelector("#pslow").onclick=()=>hablar(target,.6);
-  const check=()=>{pron.heard=ta.value.trim();if(!pron.heard){toast("Primero di la frase");return}
+  const check=()=>{const tx=document.getElementById("pheard")||ta;pron.heard=tx.value.trim();if(!pron.heard){toast("Primero di la frase");return}
     pron.res=comparar(target,pron.heard);pron.sel=null;const k=sw+":"+i;
     if(pron.res.score>(state.pron[k]||0)){state.pron[k]=pron.res.score;persist()}
     if(pron.res.score>=90)toast("¡Muy bien!");rerenderRec()};
@@ -1024,10 +1029,13 @@ function bindPron(el,s){
   const mic=el.querySelector("#pmic");
   if(mic) mic.onclick=()=>{
     if(pron.listening){try{pronSR&&pronSR.stop()}catch(e){}return}
+    prepararMic();let vigia=null,oyo=false;
     try{pronSR=new SR();pronSR.lang="en-US";pronSR.interimResults=true;pronSR.continuous=false;
-      pronSR.onresult=ev=>{let t="";for(let k=0;k<ev.results.length;k++)t+=ev.results[k][0].transcript;pron.heard=t;const x=document.getElementById("pheard");if(x)x.value=t};
-      pronSR.onend=()=>{const was=pron.listening;pron.listening=false;if(pron.heard.trim()){const x=document.getElementById("pheard");if(x)x.value=pron.heard;check()}else{if(was&&!srFalla){pronVacios=(pronVacios||0)+1;if(pronVacios>=2){marcarSrFalla(true);toast("El micrófono de la app no funciona aquí. Usa el 🎤 del teclado.")}}rerenderRec()}};
-      pronSR.onerror=e=>{pron.listening=false;const er=e&&e.error;
+      vigia=setTimeout(()=>{if(pron.listening&&!oyo){try{pronSR.abort()}catch(e){}pron.listening=false;liberarMic();
+        marcarSrFalla(true);toast("El micrófono de la app no captó tu voz. Usa el 🎤 del teclado (abajo).");rerenderRec()}},7000);
+      pronSR.onresult=ev=>{oyo=true;let t="";for(let k=0;k<ev.results.length;k++)t+=ev.results[k][0].transcript;pron.heard=t;const x=document.getElementById("pheard");if(x)x.value=t};
+      pronSR.onend=()=>{clearTimeout(vigia);liberarMic();const was=pron.listening;pron.listening=false;if(pron.heard.trim()){const x=document.getElementById("pheard");if(x)x.value=pron.heard;check()}else{if(was&&!srFalla){pronVacios=(pronVacios||0)+1;if(pronVacios>=2){marcarSrFalla(true);toast("El micrófono de la app no funciona aquí. Usa el 🎤 del teclado.")}}rerenderRec()}};
+      pronSR.onerror=e=>{clearTimeout(vigia);liberarMic();if(!pron.listening)return;pron.listening=false;const er=e&&e.error;
         if(er==="no-speech"){toast("No te escuché. Toca de nuevo y habla un poco más fuerte.");rerenderRec();return}
         marcarSrFalla(true);
         toast(er==="not-allowed"||er==="service-not-allowed"?"El iPhone no deja usar el micrófono aquí. Usa el 🎤 del teclado.":"Usa el 🎤 del teclado para dictar la frase.");rerenderRec()};
