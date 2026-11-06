@@ -921,15 +921,17 @@ function bindRec(el,s){
 // ---------- pronunciación ----------
 const pron={i:0,res:null,listening:false,heard:"",sel:null};
 const CONTR={"i'm":"i am","you're":"you are","we're":"we are","they're":"they are","it's":"it is","that's":"that is","there's":"there is","can't":"cannot","don't":"do not","doesn't":"does not","didn't":"did not","isn't":"is not","won't":"will not","i'll":"i will","we'll":"we will","let's":"let us","i'd":"i would","what's":"what is"};
-function toks(t){return t.toLowerCase().replace(/[’`]/g,"'").replace(/(\d),(\d)/g,"$1$2").replace(/[-/]/g," ").replace(/[^a-z0-9' %.]/g," ").replace(/\.(?!\d)/g," ").split(/\s+/).filter(Boolean).flatMap(w=>(CONTR[w]||w).split(" ")).map(w=>w.replace(/^'+|'+$/g,"")).filter(Boolean)}
+function toks(t,keep){return (keep?t:t.toLowerCase()).replace(/[’`]/g,"'").replace(/(\d),(\d)/g,"$1$2").replace(/[-/]/g," ").replace(/[^a-zA-Z0-9' %.]/g," ").replace(/\.(?!\d)/g," ").split(/\s+/).filter(Boolean).flatMap(w=>(CONTR[w.toLowerCase()]||w).split(" ")).map(w=>w.replace(/^'+|'+$/g,"")).filter(Boolean)}
 function comparar(target,said){
-  const T=toks(target), S=toks(said), n=T.length, m=S.length, L=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  const D=toks(target,true), T=toks(target), S=toks(said), n=T.length, m=S.length, L=Array.from({length:n+1},()=>new Array(m+1).fill(0));
   for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=T[i]===S[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
   const ok=new Array(n).fill(false);let i=0,j=0;while(i<n&&j<m){if(T[i]===S[j]){ok[i]=true;i++;j++}else if(L[i+1][j]>=L[i][j+1])i++;else j++}
   T.forEach((w,k)=>{if(/\d/.test(w)&&!ok[k])ok[k]=S.some(x=>x.replace(/\D/g,"")===w.replace(/\D/g,""))});
-  return {T,ok,score:n?Math.round(ok.filter(Boolean).length/n*100):0};
+  return {T,D,ok,score:n?Math.round(ok.filter(Boolean).length/n*100):0};
 }
-function tipPara(w){
+// siglas (RF, KPI, 5G) se dicen letra por letra; "i" suelta es el pronombre "I"
+function palabraHablada(w){if(/^[A-Z0-9]{2,}$/.test(w)&&/[A-Z]/.test(w))return w.split("").join(" ");if(w.toLowerCase()==="i")return"I";return w}
+function tipPara(w){w=w.toLowerCase();
   const t=[];
   if(/^s[ptkcmnlw]/.test(w))t.push("No agregues «e» al inicio: s-"+w.slice(1)+", no «e-"+w+"».");
   if(/[^e]ed$/.test(w)||/eed$/.test(w)===false&&/ed$/.test(w))t.push("La -ed final suena /t/ (worked), /d/ (planned) o /id/ solo después de t o d (needed).");
@@ -960,12 +962,15 @@ function soltarAudio(){try{mudoEl&&mudoEl.pause()}catch(e){}}
 function hablar(txt,rate){
   if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){toast("Este navegador no puede leer en voz alta");return}
   activarAudio();
-  const decir=()=>{try{const u=new SpeechSynthesisUtterance(txt);u.lang="en-US";u.rate=rate||.9;u.volume=1;if(!vozEN)elegirVoz();if(vozEN)u.voice=vozEN;
+  const suelta=!/\s/.test(txt.trim());
+  const decir=()=>{try{const u=new SpeechSynthesisUtterance(suelta?txt.trim()+".":txt);u.lang="en-US";u.rate=rate||.9;u.volume=1;if(!vozEN)elegirVoz();if(vozEN)u.voice=vozEN;
     let empezo=false;u.onstart=()=>{empezo=true};u.onend=()=>setTimeout(()=>{if(!speechSynthesis.speaking)soltarAudio()},400);
     u.onerror=e=>{if(e&&e.error!=="interrupted"&&e.error!=="canceled")toast("No se pudo reproducir. Quita el modo silencio y sube el volumen.")};
     speechSynthesis.resume();speechSynthesis.speak(u);
     setTimeout(()=>{if(!empezo&&!speechSynthesis.speaking)toast("¿No suena? Quita el modo silencio del iPhone y sube el volumen.")},1800)}catch(e){toast("No se pudo reproducir el audio")}};
-  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(decir,250)}else decir();
+  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(decir,250)}
+  else if(!hablar._listo){hablar._listo=true;try{const z=new SpeechSynthesisUtterance(" ");z.volume=0;speechSynthesis.speak(z)}catch(e){}setTimeout(decir,180)}
+  else decir();
 }
 const pronList=s=>(VOCAB[Math.min(s,22)]||[]).map(x=>x[2]);
 function pronCard(s){
@@ -984,8 +989,8 @@ function pronCard(s){
     <div><button class="btn" id="pcheck" type="button">Comparar</button></div>
     ${r?`<div class="fb">
       <div class="prow"><span class="pscore num" style="color:${r.score>=90?"var(--good)":r.score>=70?"var(--c-vocab)":"var(--c-speak)"}">${r.score}%</span><span class="note">${r.score>=90?"¡Se te entendió muy bien!":r.score>=70?"Bien. Repite las palabras en rojo.":"Varias palabras no se entendieron. Escucha y vuelve a intentar."}</span></div>
-      <div class="words">${r.T.map((w,k)=>`<button type="button" class="wd2 ${r.ok[k]?"ok":"bad"}" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>
-      ${pron.sel?`<div class="tip"><b>${esc(pron.sel)}</b> <span class="prow"><button class="sbtn" id="psay" type="button">🔊 Escuchar palabra</button><a class="link" href="https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(pron.sel)}" target="_blank" rel="noopener">Pronunciación en Cambridge ↗</a></span>${tipPara(pron.sel).map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:(r.ok.some(x=>!x)?'<p class="note">Toca una palabra en rojo para escucharla y ver un consejo.</p>':"")}
+      <div class="words">${r.T.map((w,k)=>{const dw=(r.D&&r.D[k])||w;return `<button type="button" class="wd2 ${r.ok[k]?"ok":"bad"}" data-w="${esc(dw)}">${esc(dw)}</button>`}).join("")}</div>
+      ${pron.sel?`<div class="tip"><b>${esc(pron.sel)}</b> <span class="prow"><button class="sbtn" id="psay" type="button">🔊 Escuchar</button><button class="sbtn" id="pslow2" type="button">🐢 Lento</button><a class="link" href="https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(pron.sel.toLowerCase())}" target="_blank" rel="noopener">Pronunciación en Cambridge ↗</a></span>${tipPara(pron.sel).map(t=>`<span>${esc(t)}</span>`).join("")}</div>`:(r.ok.some(x=>!x)?'<p class="note">Toca una palabra en rojo para escucharla y ver un consejo.</p>':"")}
     </div>`:""}
     <p class="note">Las palabras en rojo son las que el celular no reconoció: suele ser señal de que esa pronunciación no se entiende bien. No mide tu acento con detalle.</p>
   </section>`;
@@ -1011,8 +1016,11 @@ function bindPron(el,s){
     if(pron.res.score>(state.pron[k]||0)){state.pron[k]=pron.res.score;persist()}
     if(pron.res.score>=90)toast("¡Muy bien!");rerenderRec()};
   el.querySelector("#pcheck").onclick=check;
-  el.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{pron.sel=b.dataset.w;hablar(pron.sel,.7);rerenderRec()});
-  const ps=el.querySelector("#psay");if(ps)ps.onclick=()=>hablar(pron.sel,.6);
+  el.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{pron.sel=b.dataset.w;hablar(palabraHablada(pron.sel),.9);rerenderRec()});
+  const ps=el.querySelector("#psay");if(ps)ps.onclick=()=>hablar(palabraHablada(pron.sel),.9);
+  const ps2=el.querySelector("#pslow2");if(ps2)ps2.onclick=()=>hablar(palabraHablada(pron.sel),.65);
+  // prepara el audio desde el primer toque para que no se corte el inicio de la palabra
+  el.querySelector("#pron").addEventListener("pointerdown",()=>{try{activarAudio()}catch(e){}},{once:true});
   const mic=el.querySelector("#pmic");
   if(mic) mic.onclick=()=>{
     if(pron.listening){try{pronSR&&pronSR.stop()}catch(e){}return}
